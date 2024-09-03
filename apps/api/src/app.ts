@@ -9,7 +9,7 @@ import express, {
 } from 'express';
 import cors from 'cors';
 import { PORT } from './config';
-import { SampleRouter } from './routers/sample.router';
+import { EventRouter } from './routers/event.router';
 
 export default class App {
   private app: Express;
@@ -51,18 +51,18 @@ export default class App {
   }
 
   private routes(): void {
-    const sampleRouter = new SampleRouter();
+    const eventRouter = new EventRouter()
 
     this.app.get('/api', (req: Request, res: Response) => {
-      res.send(`Hello, Purwadhika Student API!`);
-    });
+        res.send(`Hello, This is my API`)
+    })
 
-    this.app.use('/api/samples', sampleRouter.getRouter());
-  }
+    this.app.use('/api/events', eventRouter.getRouter())
+}
 
   public start(): void {
     this.app.listen(PORT, () => {
-      console.log(`  ➜  [API] Local:   http://localhost:${PORT}/`);
-    });
-  }
+        console.log(`[API] local:   http://localhost:${PORT}/api`)
+    })
+}
 }

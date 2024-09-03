@@ -20,10 +20,101 @@ model Sample {
   @@map("samples") // if you want to use snake_case format
 }
 
-model User {
+enum Category {
+  concert
+  musical
+  play
+  classic
+}
+
+enum EventType {
+  free
+  paid
+}
+
+enum TierName {
+  VIP
+  regular
+}
+
+enum Operations {
+  add
+  subtract
+}
+
+enum PaymentStatus {
+  unpaid
+  pending
+  paid
+}
+
+model Users {
   id       Int      @id @default(autoincrement())
-  name     String
+  username String
+  password String
   email    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  full_name String
+  created_date DateTime @default(now())
+  referral_code String
+  @@map("ms_users")
+}
+
+model Events {
+  id          Int      @id @default(autoincrement())
+  name        String
+  event_date  DateTime
+  location    String
+  venue       String
+  category    Category
+  event_type  EventType
+  event_description String @db.LongText
+  image       String? @map("image")
+  ticket_start_date DateTime
+  ticket_end_date DateTime
+  created_date DateTime
+  modified_date DateTime
+  @@map("ms_events")
+  }
+
+model EventsPrice {
+  id            Int      @id @default(autoincrement())
+  event_id      Int
+  tier_name     TierName
+  max_capacity  Int
+  price         Float
+  @@map("ms_events_price")
+}
+
+model EventsReview {
+  id            Int      @id @default(autoincrement())
+  event_id      Int
+  user_id       Int
+  rating        Int
+  review        String @db.LongText
+  created_date  DateTime
+  @@map("tx_events_review")
+}
+
+model UsersPoints {
+  id          Int      @id @default(autoincrement())
+  user_id     Int
+  operations  Operations
+  points      Int
+  created_date DateTime
+  expired_date DateTime
+  @@map("tx_users_points")
+}
+
+model Transactions {
+  id                Int      @id @default(autoincrement())
+  event_id          Int
+  user_id           Int
+  tier_id           Int
+  promo_code Int
+  points_used Int
+  original_price Int
+  discounted_price Int
+  payment_status PaymentStatus
+  payment_date DateTime
+  @@map("tx_transactions")
 }
