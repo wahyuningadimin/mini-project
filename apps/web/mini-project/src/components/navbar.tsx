@@ -29,9 +29,6 @@ export default function Navbar() {
         <p className="btn btn-ghost text-xl"><Link href={'/'}>Festiva</Link></p>
       </div>
       <div className="navbar-center lg:flex flex-1 justify-center">
-    <div className="form-control">
-      <input type="text" placeholder="Search" className="input input-bordered w-full md:w-auto lg:max-w-md" />
-    </div>
     </div>
 
     

@@ -96,10 +96,10 @@ model EventsReview {
 }
 
 model UsersPoints {
-  id          Int      @id @default(autoincrement())
-  user_id     Int
-  operations  Operations
-  points      Int
+  id           Int      @id @default(autoincrement())
+  user_id      Int
+  operations   Operations
+  points       Int
   created_date DateTime
   expired_date DateTime
   @@map("tx_users_points")
@@ -110,11 +110,11 @@ model Transactions {
   event_id          Int
   user_id           Int
   tier_id           Int
-  promo_code Int
-  points_used Int
-  original_price Int
-  discounted_price Int
-  payment_status PaymentStatus
-  payment_date DateTime
+  promo_code        Int
+  points_used       Int
+  original_price    Int
+  discounted_price  Int
+  payment_status    PaymentStatus
+  payment_date      DateTime
   @@map("tx_transactions")
 }
