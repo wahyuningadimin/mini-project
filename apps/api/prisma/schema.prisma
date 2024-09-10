@@ -109,7 +109,6 @@ model Transactions {
   id                Int      @id @default(autoincrement())
   event_id          Int
   user_id           Int
-  tier_id           Int
   promo_code        Int
   points_used       Int
   original_price    Int
@@ -117,4 +116,13 @@ model Transactions {
   payment_status    PaymentStatus
   payment_date      DateTime
   @@map("tx_transactions")
+}
+
+
+model TransactionDetails {
+  id                Int      @id @default(autoincrement())
+  transaction_id    Int
+  tier_id           Int
+  quantity          Int
+  @@map("tx_transaction_details")
 }

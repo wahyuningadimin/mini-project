@@ -1,104 +1,130 @@
-'use client'
-import { useRouter } from 'next/navigation'; // For client-side navigation
+'use client';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Wrapper from '@/components/wrapper';
 import PaymentForm from './_components/form';
 import { useEffect, useState } from 'react';
-import { getEventTiers } from '@/lib/events';
+import { getEventbyId, getEventTiers } from '@/lib/events';
 
 export default function PaymentPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [eventId, setEventId] = useState<string | null>(null);
     const [tiers, setTiers] = useState<{ tier_name: string; price: number }[]>([]);
     const [selectedTier, setSelectedTier] = useState<string>('');
+    const [eventName, setEventName] = useState<string>('');
     const [quantity, setQuantity] = useState<number>(1);
+    const [promoCode, setPromoCode] = useState<string>('');
+    const [discount, setDiscount] = useState<number>(0); // Assuming discount is a percentage
+    const [finalPrice, setFinalPrice] = useState<number>(0);
 
     useEffect(() => {
-        const fetchTiers = async () => {
-            if (eventId) {
-                const { tiers } = await getEventTiers(eventId);
-                setTiers(tiers);
-    
-                // Default to the first tier
-                if (tiers.length > 0) {
-                    setSelectedTier(tiers[0].tier_name);
-                }
-            }
-        };
-    
-    
-    const url = 'http://localhost:3000/events/1'; // Replace with your URL or fetch it dynamically
-    const query = new URLSearchParams(new URL(url).search);
-    const id = query.get('id');
-    setEventId(id);
-    if (id) {
-        fetchTiers();
-    }
-}, [eventId]);
-
-    // Calculate total price based on selected tier and quantity
-    const selectedTierPrice = tiers.find(tier => tier.tier_name === selectedTier)?.price || 0;
-    const finalPrice = selectedTierPrice * quantity;
+        const id = searchParams.get('id');
+        setEventId(id);
+    }, [searchParams]);
 
     useEffect(() => {
-        const fetchTiers = async () => {
+        const fetchData = async () => {
             if (eventId) {
                 try {
+                    const eventData = await getEventbyId(eventId);
+                    setEventName(eventData.event.name);
                     const { tiers } = await getEventTiers(eventId);
                     setTiers(tiers);
 
-                    // Default to the first tier
                     if (tiers.length > 0) {
                         setSelectedTier(tiers[0].tier_name);
                     }
                 } catch (error) {
-                    console.error('Error fetching tiers:', error);
+                    console.error('Error fetching event or tiers:', error);
                 }
             }
         };
 
-        fetchTiers();
-    }, [eventId]); // This effect runs when `eventId` changes
+        fetchData();
+    }, [eventId]);
+
+    useEffect(() => {
+        // Calculate the total price whenever tier or quantity changes
+        const selectedTierPrice = tiers.find(tier => tier.tier_name === selectedTier)?.price || 0;
+        const basePrice = selectedTierPrice * quantity;
+        const discountAmount = basePrice * (discount / 100);
+        const discountedPrice = basePrice - discountAmount;
+        setFinalPrice(discountedPrice);
+    }, [selectedTier, quantity, discount, tiers]);
+
+    const handlePromoCodeApply = () => {
+        // Simple example: if promo code is 'DISCOUNT10', apply 10% discount
+        if (promoCode === 'DISCOUNT10') {
+            setDiscount(10);
+        } else {
+            setDiscount(0);
+            alert('Invalid promo code');
+        }
+    };
 
     return (
         <Wrapper>
-            <div className="p-4">
-                <h1 className="text-2xl font-bold">Payment Page</h1>
-                <p>You are buying ticket for: {eventId}</p>
+            <div className="flex flex-col items-center">
+                <div className="w-full max-w-lg">
+                    <h1 className="text-2xl font-bold mb-4">Payment Page</h1>
+                    <p className="mb-4">You are buying a ticket for: <strong>{eventName}</strong></p>
 
-                {/* Ticket Information */}
-                <div className="my-4">
-                    <h2 className="text-xl font-semibold">Ticket Information</h2>
-                    <div className="mt-2">
-                        <label htmlFor="ticketCategory" className="block text-sm font-medium mb-1">Ticket Category</label>
-                        <select
-                            id="ticketCategory"
-                            value={selectedTier}
-                            onChange={(e) => setSelectedTier(e.target.value)}
-                            className="w-full p-2 border border-gray-300 rounded"
-                        >
-                            {tiers.map(tier => (
-                                <option key={tier.tier_name} value={tier.tier_name}>{tier.tier_name}</option>
-                            ))}
-                        </select>
+                    {/* Ticket Information */}
+                    <div className="my-4">
+                        <h2 className="text-xl font-semibold mb-2">Ticket Information</h2>
+                        <div className="mt-2">
+                            <label htmlFor="ticketCategory" className="block text-sm font-medium mb-1">Ticket Category</label>
+                            <select
+                                id="ticketCategory"
+                                value={selectedTier}
+                                onChange={(e) => setSelectedTier(e.target.value)}
+                                className="w-full p-2 border border-gray-300 rounded"
+                            >
+                                {tiers.map(tier => (
+                                    <option key={tier.tier_name} value={tier.tier_name}>{tier.tier_name}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="mt-2">
+                            <label htmlFor="quantity" className="block text-sm font-medium mb-1">Quantity</label>
+                            <input
+                                type="number"
+                                id="quantity"
+                                value={quantity}
+                                onChange={(e) => setQuantity(Number(e.target.value))}
+                                min="1"
+                                className="w-full p-2 border border-gray-300 rounded"
+                            />
+                        </div>
+                        <div className="mt-2">
+                            <p className="text-lg font-medium">Total Price: {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'IDR' }).format(finalPrice)}</p>
+                        </div>
                     </div>
-                    <div className="mt-2">
-                        <label htmlFor="quantity" className="block text-sm font-medium mb-1">Quantity</label>
-                        <input
-                            type="number"
-                            id="quantity"
-                            value={quantity}
-                            onChange={(e) => setQuantity(Number(e.target.value))}
-                            min="1"
-                            className="w-full p-2 border border-gray-300 rounded"
-                        />
+
+                    {/* Promo Code Input */}
+                    <div className="mb-4">
+                        <label htmlFor="promoCode" className="block text-sm font-medium mb-1">Promo Code (Optional)</label>
+                        <div className="flex">
+                            <input
+                                type="text"
+                                id="promoCode"
+                                value={promoCode}
+                                onChange={(e) => setPromoCode(e.target.value)}
+                                className="w-full p-2 border border-gray-300 rounded"
+                            />
+                            <button
+                                type="button"
+                                onClick={handlePromoCodeApply}
+                                className="ml-2 bg-blue-500 text-white p-2 rounded"
+                            >
+                                Apply
+                            </button>
+                        </div>
                     </div>
-                    <div className="mt-2">
-                        <p className="text-lg font-medium">Total Price: {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'IDR' }).format(finalPrice)}</p>
-                    </div>
+
+                    {/* Payment Form */}
+                    <PaymentForm totalPrice={finalPrice} />
                 </div>
-
-                {/* Payment Form */}
-                <PaymentForm />
             </div>
         </Wrapper>
     );

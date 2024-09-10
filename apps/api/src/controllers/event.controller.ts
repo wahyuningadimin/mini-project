@@ -107,6 +107,50 @@ export class EventController {
         }
     }
 
+    async getEventTiers(req: Request, res: Response) {
+        try {
+            const tiers = await prisma.$queryRaw`
+            SELECT 
+                a.id, 
+                a.tier_name, 
+                a.max_capacity, 
+                a.price, 
+                (a.max_capacity - IFNULL(SUM(b.quantity), 0)) AS remaining_capacity
+            FROM ms_events_price a
+            LEFT JOIN tx_transaction_details b ON a.event_id = b.event_id AND a.id = b.tier_id
+            WHERE a.event_id = ${req.params.eventId}
+            GROUP BY a.id, a.tier_name, a.max_capacity, a.price;`
+            res.status(200).send({
+                status: 'ok',
+                tiers
+            })
+        } catch (err) {
+            res.status(400).send({
+                status: 'error',
+                msg: err
+            })
+        }
+    }
+
+
+
+    async eventCheckout(req: Request, res: Response) {
+        try {
+            const { user_id, event_id, promo_code, points_used, payment_methods, tier_id, quantity } = req.body;
+
+
+            res.status(200).send({ 
+                status: 'success'
+            });
+        } catch (err) {
+            console.error('Payment processing error:', err);
+            res.status(500).send({ 
+                status: 'error', 
+                msg: 'Payment processing failed' });
+        }
+    }
+    
+
     async deleteEvent(req: Request, res: Response) {
         try {const { id } = req.params;
 
@@ -145,4 +189,5 @@ export class EventController {
         }
     }
 }
+
 

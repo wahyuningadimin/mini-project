@@ -1,32 +1,42 @@
-'use client'; // Ensure this is a client component
+// components/PaymentForm.js
+'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
-export default function PaymentForm() {
+export default function PaymentForm({ totalPrice }) {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [cardNumber, setCardNumber] = useState('');
     const [expiryDate, setExpiryDate] = useState('');
     const [cvv, setCvv] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('creditCard');
+    const [accountNumber, setAccountNumber] = useState('');
+    const [routingNumber, setRoutingNumber] = useState('');
+    const [ovoNumber, setOvoNumber] = useState('');
+    const [gopayNumber, setGopayNumber] = useState('');
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+    const router = useRouter();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!name || !email || !cardNumber || !expiryDate || !cvv) {
-            setError('Please fill in all fields');
+        // Basic validation
+        if (!name || !email || !paymentMethod) {
+            setError('Please fill in all required fields');
             return;
         }
 
         setError('');
-        // Simulate payment processing
+        setLoading(true);
+
         try {
-            console.log('Processing payment...');
-            // Implement actual payment processing logic here
+
         } catch (error) {
+            console.error('An error occurred:', error);
             setError('Payment processing failed');
-        }
+
     };
 
     return (
@@ -60,7 +70,9 @@ export default function PaymentForm() {
                     className="w-full p-2 border border-gray-300 rounded"
                 >
                     <option value="creditCard">Credit Card</option>
-                    <option value="bankTransfer">Bank Transfer</option>
+                    <option value="mobileBanking">Mobile Banking</option>
+                    <option value="ovo">OVO</option>
+                    <option value="gopay">GoPay</option>
                 </select>
             </div>
             {paymentMethod === 'creditCard' && (
@@ -99,14 +111,65 @@ export default function PaymentForm() {
                     </div>
                 </>
             )}
-            {/* Add additional fields for PayPal or Bank Transfer if needed */}
+            {paymentMethod === 'mobileBanking' && (
+                <>
+                    <div className="mb-4">
+                        <label htmlFor="accountNumber" className="block text-sm font-medium mb-1">Account Number</label>
+                        <input
+                            type="text"
+                            id="accountNumber"
+                            value={accountNumber}
+                            onChange={(e) => setAccountNumber(e.target.value)}
+                            className="w-full p-2 border border-gray-300 rounded"
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <label htmlFor="routingNumber" className="block text-sm font-medium mb-1">Routing Number</label>
+                        <input
+                            type="text"
+                            id="routingNumber"
+                            value={routingNumber}
+                            onChange={(e) => setRoutingNumber(e.target.value)}
+                            className="w-full p-2 border border-gray-300 rounded"
+                        />
+                    </div>
+                </>
+            )}
+            {paymentMethod === 'ovo' && (
+                <div className="mb-4">
+                    <label htmlFor="ovoNumber" className="block text-sm font-medium mb-1">OVO Number</label>
+                    <input
+                        type="text"
+                        id="ovoNumber"
+                        value={ovoNumber}
+                        onChange={(e) => setOvoNumber(e.target.value)}
+                        className="w-full p-2 border border-gray-300 rounded"
+                    />
+                </div>
+            )}
+            {paymentMethod === 'gopay' && (
+                <div className="mb-4">
+                    <label htmlFor="gopayNumber" className="block text-sm font-medium mb-1">GoPay Number</label>
+                    <input
+                        type="text"
+                        id="gopayNumber"
+                        value={gopayNumber}
+                        onChange={(e) => setGopayNumber(e.target.value)}
+                        className="w-full p-2 border border-gray-300 rounded"
+                    />
+                </div>
+            )}
+            <div className="mb-4">
+                <p className="text-lg font-medium">Total Price: {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'IDR' }).format(totalPrice)}</p>
+            </div>
             {error && <p className="text-red-500 mb-4">{error}</p>}
             <button
                 type="submit"
-                className="w-full bg-gray-800 text-white p-2 rounded"
+                className="w-full bg-gray-800 text-white p-2 rounded mb-8"
+                disabled={loading}
             >
-                Submit Payment
+                {loading ? 'Processing...' : 'Submit Payment'}
             </button>
         </form>
     );
-}
+}}
