@@ -14,7 +14,7 @@ export default function Hero(){
       <p className="mb-5 text-md">
         Feel the Beat, Live the Moment!
       </p>
-      <button className="btn"><Link href={"/search"}>Search your next event</Link></button>
+      <button className="btn"><Link href={'/search'}>Search your next event</Link></button>
     </div>
   </div>
 </div>

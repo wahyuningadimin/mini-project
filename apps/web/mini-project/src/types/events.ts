@@ -55,7 +55,6 @@ export interface Transaction {
   id: number;
   event_id: number;
   user_id: number;
-  tier_id: number;
   promo_code: number;
   points_used: number;
   original_price: number;
@@ -64,3 +63,10 @@ export interface Transaction {
   payment_date: string;
 }
     // image?: File | string | null;
+
+export interface TransactionDetails {
+  id: number;
+  transaction_id: number;
+  tier_id: number;
+  quantity: number;
+}

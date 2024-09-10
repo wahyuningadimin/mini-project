@@ -1,41 +1,33 @@
+import { formatDate } from "@/app/helper/formatDate";
 import { splitString } from "@/app/helper/splitString";
 import Link from "next/link"
 
 interface ICardBlog {
-    title: string
+    id: number
     image: string
-    avatar: string
-    email: string
-    author: string
+    name: string
+    event_date: string
+    location: string
     slug: string
 }
 
-export const CardBlog: React.FC<ICardBlog> = ({ title, image, avatar, email, author, slug }) => {
+export const CardBlog: React.FC<ICardBlog> = ({ id, image, name, event_date, location, slug }) => {
     return (
-        <div data-cy="blog-item" className="bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-          <img data-cy="blog-img" className="rounded-t-lg h-[200px] w-full " src={image} alt={title} />
-          <div className="p-4">
-              <h5 data-cy="blog-title" className="mb-2 text-md font-bold tracking-tight text-gray-900 dark:text-white">{splitString(title, 50)}</h5>
-              <div className="flex items-center my-5">
-                    <div className="flex-shrink-0">
-                        <img className="w-10 h-10 rounded-full" src={avatar} alt="Neil image" />
-                    </div>
-                    <div className="flex-1 min-w-0 ms-4">
-                        <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
-                            {author}
-                        </p>
-                        <p className="text-sm text-gray-500 truncate dark:text-gray-400">
-                            {email}
-                        </p>
-                    </div>
-                </div>
-              <Link data-cy="blog-redirect" href={`/blog/${slug}`} className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                  Read more
-                  <svg className="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
-                      <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
-                  </svg>
-              </Link>
+        <main className='py-4 px-8'>
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+      <Link key={id} href={`/events/${id}`}>
+        <div className="relative bg-white border border-gray-200 shadow-lg flex flex-col transition-transform transform hover:scale-105 p-4" style={{ width: '100%', paddingBottom: '150%' }}>
+          <div className="absolute inset-0 flex flex-col">
+            <img src={image} alt={name} className="w-full h-3/4 object-cover mb-1" style={{ height: '68%' }} />
+            <div className="flex flex-col flex-grow px-4 pt-2" style={{ height: '10%' }}>
+              <h2 className="text-lg font-semibold text-gray-900 mb-1">{name}</h2>
+              <p className="text-gray-600 text-sm mb-1">{formatDate(event_date)}</p>
+              <p className="text-gray-500 text-sm mb-4">{location}</p>
+            </div>
           </div>
-      </div>
+        </div>
+      </Link>
+  </div>
+</main>
     )
 }
