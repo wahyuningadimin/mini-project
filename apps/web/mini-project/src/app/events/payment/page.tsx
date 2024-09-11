@@ -9,8 +9,8 @@ export default function PaymentPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [eventId, setEventId] = useState<string | null>(null);
-    const [tiers, setTiers] = useState<{ tier_name: string; price: number }[]>([]);
-    const [selectedTier, setSelectedTier] = useState<string>('');
+    const [tiers, setTiers] = useState<{ tier_name: string; price: number; id: number }[]>([]);
+    const [selectedTier, setSelectedTier] = useState<number>(0);
     const [eventName, setEventName] = useState<string>('');
     const [quantity, setQuantity] = useState<number>(1);
     const [promoCode, setPromoCode] = useState<string>('');
@@ -32,7 +32,7 @@ export default function PaymentPage() {
                     setTiers(tiers);
 
                     if (tiers.length > 0) {
-                        setSelectedTier(tiers[0].tier_name);
+                        setSelectedTier(tiers[0].id);
                     }
                 } catch (error) {
                     console.error('Error fetching event or tiers:', error);
@@ -45,7 +45,7 @@ export default function PaymentPage() {
 
     useEffect(() => {
         // Calculate the total price whenever tier or quantity changes
-        const selectedTierPrice = tiers.find(tier => tier.tier_name === selectedTier)?.price || 0;
+        const selectedTierPrice = tiers.find(tier => tier.id === selectedTier)?.price || 0;
         const basePrice = selectedTierPrice * quantity;
         const discountAmount = basePrice * (discount / 100);
         const discountedPrice = basePrice - discountAmount;
@@ -77,11 +77,11 @@ export default function PaymentPage() {
                             <select
                                 id="ticketCategory"
                                 value={selectedTier}
-                                onChange={(e) => setSelectedTier(e.target.value)}
+                                onChange={(e) => setSelectedTier(Number(e.target.value))}
                                 className="w-full p-2 border border-gray-300 rounded"
                             >
                                 {tiers.map(tier => (
-                                    <option key={tier.tier_name} value={tier.tier_name}>{tier.tier_name}</option>
+                                    <option key={tier.tier_name} value={tier.id}>{tier.tier_name}</option>
                                 ))}
                             </select>
                         </div>
@@ -123,7 +123,7 @@ export default function PaymentPage() {
                     </div>
 
                     {/* Payment Form */}
-                    <PaymentForm totalPrice={finalPrice} />
+                    <PaymentForm totalPrice={finalPrice} eventId={eventId} tierId={selectedTier} quantity={quantity} />
                 </div>
             </div>
         </Wrapper>

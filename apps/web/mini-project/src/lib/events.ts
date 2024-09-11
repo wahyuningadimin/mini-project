@@ -1,6 +1,6 @@
 const base_url = process.env.BASE_URL_API || "http://localhost:8000/api"
 
-export const getEvents = async () => {
+export const getEvents = async (p0: { search: string }) => {
     const res = await fetch(`${base_url}/events`, { cache: 'no-cache' })
     const result = await res.json()
 
@@ -20,6 +20,8 @@ export const getEventTiers = async (id: string) => {
 
     return { result, tiers: result.tiers, ok: res.ok }
 }
+
+
 // export const getEvent = async (search: string) => {
 //     const res = await fetch(`${base_url}/events${search}`, { cache: 'no-cache' })
 //     const result = await res.json()

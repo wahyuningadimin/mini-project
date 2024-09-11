@@ -121,6 +121,7 @@ model Transactions {
 
 model TransactionDetails {
   id                Int      @id @default(autoincrement())
+  event_id          Int
   transaction_id    Int
   tier_id           Int
   quantity          Int

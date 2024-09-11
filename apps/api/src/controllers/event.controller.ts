@@ -136,8 +136,106 @@ export class EventController {
 
     async eventCheckout(req: Request, res: Response) {
         try {
-            const { user_id, event_id, promo_code, points_used, payment_methods, tier_id, quantity } = req.body;
+            // Receiving data from the API request
+            const { userId, eventId, promoCode, pointsUsed, paymentMethod, tickets } = req.body;
 
+            // Validate the userId into database. User should exist, otherwise, we can not verify the ownership of the ticket
+            // First, get the user from DB using the userId from API
+            const userFromDB = await prisma.users.findUnique({
+                where: {id: Number(userId)}
+            })
+
+            // Next, check if the userFromDB doesn't exist. If it doesn't, return error
+            if (!userFromDB) {
+                res.status(400).send({ 
+                    status: 'error', 
+                    msg: 'Unable to find user!' });
+            }
+
+            // Validate the event from the request. The event should exist.
+            const eventFromDB = await prisma.events.findUnique({
+                where: {id: Number(eventId)}
+            })
+
+            // Next, check if the eventFromDB doesn't exist. If it doesn't, return error
+            if (!eventFromDB) {
+                res.status(400).send({ 
+                    status: 'error', 
+                    msg: `Event doesn't exist!` });
+            }
+
+            let totalPrice = 0;
+            // Check if event is free or paid. If paid, calculate the price
+            if (eventFromDB && eventFromDB.event_type.toLowerCase() === 'paid') {
+                // Get the tier prices for event
+                const tiers:any = await prisma.$queryRaw`
+                                    SELECT 
+                                        a.id, 
+                                        a.tier_name, 
+                                        a.max_capacity, 
+                                        a.price, 
+                                        (a.max_capacity - IFNULL(SUM(b.quantity), 0)) AS remaining_capacity
+                                    FROM ms_events_price a
+                                    LEFT JOIN tx_transaction_details b ON a.event_id = b.event_id AND a.id = b.tier_id
+                                    WHERE a.event_id = ${req.params.eventId}
+                                    GROUP BY a.id, a.tier_name, a.max_capacity, a.price;`;
+                
+                // Compare the tickets bought with the prices, then calculate the totalPrice
+                tickets.forEach((ticket: any) => {
+                    const tierId = ticket.tierId;
+
+                    const matchingTier = tiers.find((tier: any) => {
+                        return tier.id == tierId
+                    });
+                    if (matchingTier) {
+                        totalPrice += matchingTier.price * ticket.quantity;
+                    }
+                })
+            }
+
+             // Compose the tx_transaction object to be inserted
+             const newTransaction: any = {
+                event_id: eventId,
+                user_id: userId,
+                promo_code: promoCode,
+                points_used: pointsUsed,
+                original_price: totalPrice,
+                discounted_price: totalPrice, // Need to be adjusted to calculate the promo
+                payment_status: 'paid',
+                payment_date: new Date()
+            }
+            // Insert the transaction object into DB
+            const createdTransaction = await prisma.transactions.create({
+                data: newTransaction
+            })
+
+            // Check if transaction created successfully
+            if (createdTransaction.id) {
+                let transactionDetails: any = [];
+
+                tickets.forEach((ticket: any) => {
+                    const tempDetail = {
+                        transaction_id: createdTransaction.id, // Insert the newly created transaction id into transaction details table
+                        event_id: eventId,
+                        tier_id: ticket.tierId,
+                        quantity: ticket.quantity
+                    }
+
+                    transactionDetails.push(tempDetail);
+                })
+
+                // Check if the data exist
+                if (transactionDetails.length > 0) {
+                    // Insert the data into tx_transaction_details
+                    await prisma.transactionDetails.createMany({
+                        data: transactionDetails
+                    })
+                }
+            } else {
+                res.status(500).send({ 
+                    status: 'error', 
+                    msg: 'There is something wrong. Please try again later!' });
+            }
 
             res.status(200).send({ 
                 status: 'success'

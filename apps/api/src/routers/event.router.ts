@@ -19,7 +19,7 @@ export class EventRouter {
         this.router.get('/', this.eventController.getEvents)
         this.router.get('/:id', this.eventController.getEventById)
         this.router.get('/getEventTiers/:eventId', this.eventController.getEventTiers)
-        // this.router.post('/checkout', this.eventController.eventCheckout)
+        this.router.post('/eventCheckout', this.eventController.eventCheckout)
         this.router.delete('/:id', this.eventController.deleteEvent)
     }
 
