@@ -28,10 +28,20 @@ export const getEventTiers = async (id: string) => {
     return { result, tiers: result.tiers, ok: res.ok }
 }
 
-export const getMasterLocations = async() => {
-    const res = await fetch(`${base_url}/events/locations`, { cache: 'no-cache' })
+export const getMasterLocations = async(category: string) => {
+    const res = await fetch(`${base_url}/events/locations?category=${category}`, { cache: 'no-cache' })
     const result = await res.json();
 
+    return { result };
+}
+
+export const createEvent = async(formData: FormData) => {
+    const res = await fetch(`${base_url}/events/createEvent`, { 
+        cache: 'no-cache',
+        method: "POST",
+        body: formData
+    })
+    const result = await res.json();
     return { result };
 }
 
