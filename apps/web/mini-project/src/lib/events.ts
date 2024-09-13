@@ -1,6 +1,6 @@
 const base_url = process.env.BASE_URL_API || "http://localhost:8000/api"
 
-export const getEvents = async (p0: { search: string }) => {
+export const getEvents = async () => {
     const res = await fetch(`${base_url}/events`, { cache: 'no-cache' })
     const result = await res.json()
 
@@ -14,11 +14,25 @@ export const getEventbyId = async (id: string) => {
     return { result, event: result.event, ok: res.ok }
 }
 
+export const getEventsPaginated = async (query: string, page: any, size: any, category: string, location: string) => {
+    const res = await fetch(`${base_url}/events/paginated?query=${query}&page=${page}&size=${size}&category=${category}&location=${location}`);
+    const result = await res.json();
+
+    return { result };
+}
+
 export const getEventTiers = async (id: string) => {
     const res = await fetch(`${base_url}/events/getEventTiers/${id}`, { cache: 'no-cache' })
     const result = await res.json()
 
     return { result, tiers: result.tiers, ok: res.ok }
+}
+
+export const getMasterLocations = async() => {
+    const res = await fetch(`${base_url}/events/locations`, { cache: 'no-cache' })
+    const result = await res.json();
+
+    return { result };
 }
 
 

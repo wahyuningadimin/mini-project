@@ -1,48 +1,53 @@
 'use client'
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import Link from 'next/link';
 import debounce from 'lodash/debounce';
 import { Event } from '../types/events';
 import Hero from './hero/page';
 import { formatDate } from './helper/formatDate';
+import { getEventsPaginated, getMasterLocations } from '@/lib/events';
+import Pagination from '@/components/pagination';
 
-export default function Home() {
+export default function Home({
+  searchParams,
+}: {
+  searchParams?: {
+    query?: string;
+    page?: string;
+  };
+}) {
   const [events, setEvents] = useState<Event[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedLocation, setSelectedLocation] = useState<string>('');
-  const [page, setPage] = useState<number>(1);
-  const [totalPages, setTotalPages] = useState<number>(1);
-  const [locations, setLocations] = useState<string[]>([]); // Add state for locations
+  const [page, setPage] = useState<number>(0);
+  const [size, setSize] = useState<number>(10);
+  const [totalPages, setTotalPages] = useState<number>(0);
+  const [locations, setLocations] = useState<string[]>([]);
+
+  const query = searchParams?.query || '';
+
+  useEffect(() => {
+    const fetchMasterLocations = async () => {
+      const response = await getMasterLocations();
+      console.log(JSON.stringify(response));
+      const data = response.result;
+      const masterLocations = data.locations.map((item:any) => item.location);
+
+      setLocations(masterLocations);
+    }
+    fetchMasterLocations();
+  },[]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/events');
-        const { events, totalPages } = response.data;
-        // Extract unique locations
-        const uniqueLocations = Array.from(new Set(events.map(event => event.location)));
-        setLocations(uniqueLocations);
+        const response = await getEventsPaginated(searchTerm, page, size, "", selectedLocation);
+        const data = response.result;
+
+        setEvents(data.data);
         
-        let filteredEvents = events;
-
-        // Filter based on search term
-        if (searchTerm) {
-          filteredEvents = filteredEvents.filter(event =>
-            event.name.toLowerCase().includes(searchTerm.toLowerCase())
-          );
-        }
-
-        // Filter based on selected location
-        if (selectedLocation) {
-          filteredEvents = filteredEvents.filter(event =>
-            event.location === selectedLocation
-          );
-        }
-
-        setEvents(events);
-        setFilteredEvents(filteredEvents);
+        const totalPages = Math.ceil(data.totalCount/size);
         setTotalPages(totalPages);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -55,17 +60,18 @@ export default function Home() {
 
   const handleSearch = debounce((event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
-    setPage(1);
+    setPage(0);
   }, 300);
 
   const handleLocationChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedLocation(event.target.value);
-    setPage(1);
+    setPage(0);
   };
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
   };
+  
 
   return (
     <>
@@ -97,7 +103,7 @@ export default function Home() {
 
         <main className='py-4 px-8'>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {filteredEvents.map((event) => (
+            {events.map((event) => (
               <Link key={event.id} href={`/events/${event.id}`}>
                 <div className="relative bg-white border border-gray-200 shadow-lg flex flex-col transition-transform transform hover:scale-105 p-4" style={{ width: '100%', paddingBottom: '150%' }}>
                   <div className="absolute inset-0 flex flex-col">
@@ -113,14 +119,8 @@ export default function Home() {
             ))}
           </div>
 
-          {/* Pagination Controls */}
           <div className="flex justify-center space-x-4 mt-8">
-            {page > 1 && (
-              <button onClick={() => handlePageChange(page - 1)} className="btn btn-primary">Previous</button>
-            )}
-            {page < totalPages && (
-              <button onClick={() => handlePageChange(page + 1)} className="btn btn-primary">Next</button>
-            )}
+            <Pagination currentPage={page} totalPages={totalPages} handlePageChange={handlePageChange} />
           </div>
         </main>
       </div>

@@ -17,6 +17,8 @@ export class EventRouter {
         this.router.post('/createEvent', this.eventController.createEvent)
         this.router.patch('/:id', this.eventController.editEvent)
         this.router.get('/', this.eventController.getEvents)
+        this.router.get('/paginated', this.eventController.getEventsPaginated);
+        this.router.get('/locations', this.eventController.getLocations);
         this.router.get('/:id', this.eventController.getEventById)
         this.router.get('/getEventTiers/:eventId', this.eventController.getEventTiers)
         this.router.post('/eventCheckout', this.eventController.eventCheckout)

@@ -1,3 +1,4 @@
+'use client'
 import React from 'react';
 import { ReviewFormCreate } from './_components/form';
 

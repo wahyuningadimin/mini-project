@@ -78,8 +78,8 @@ export default async function EventDetail({ params }: { params: { id: string }})
             <div className="flex-1 pl-4 flex flex-col">
                 {/* Category and Event Type */}
                 <div className="flex flex-col mb-">
-                <p className="font-bold text-lg">{event.category}</p>
-                <p className="text-lg sm:text-base">{event.event_type}</p>
+                <p className="font-bold text-lg uppercase">{event.category}</p>
+                <p className="text-lg sm:text-base uppercase">{event.event_type}</p>
                 </div>
     
                 {/* Event Name */}
@@ -108,6 +108,7 @@ export default async function EventDetail({ params }: { params: { id: string }})
                 </h5>
                     <div className="bg-gray-100 dark:bg-gray-800 rounded-lg shadow-md mb-8">
                 {/* Header Row */}
+
                 <div className="flex justify-between items-center p-4 bg-gray-200 dark:bg-gray-700 font-bold border-b border-gray-300 dark:border-gray-700">
                     <p className="text-md text-gray-900 dark:text-gray-100">Category</p>
                     <p className="text-md text-gray-900 dark:text-gray-100">Price</p>
@@ -115,13 +116,13 @@ export default async function EventDetail({ params }: { params: { id: string }})
                 </div>
 
                 {/* Data Rows */}
-                {tiers.map((tier, index) => (
+                {tiers.map((tier: any, index: any) => (
                     <div
                     key={index}
                     className={`flex justify-between items-center p-4 ${index % 2 === 0 ? 'bg-white dark:bg-gray-700' : 'bg-gray-50 dark:bg-gray-600'} border-b border-gray-300 dark:border-gray-700 last:border-b-0`}
                 >
-                    <p className="text-md font-bold text-gray-900 dark:text-gray-100">{tier.tier_name}</p>
-                    <p className="text-md text-gray-900 dark:text-gray-100">
+                    <p className="uppercase text-md font-bold text-gray-900 dark:text-gray-100">{tier.tier_name}</p>
+                    <p className="uppercase text-md text-gray-900 dark:text-gray-100">
                         {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'IDR'}).format(tier.price)}
                     </p>
                     <p className="text-md text-gray-500 dark:text-gray-400">{tier.remaining_capacity}</p>

@@ -1,5 +1,6 @@
 'use client'; // Ensure this is a client component
 
+import { redirect, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function PaymentForm({ totalPrice, eventId, tierId, quantity }) {
@@ -14,8 +15,9 @@ export default function PaymentForm({ totalPrice, eventId, tierId, quantity }) {
     const [gopayNumber, setGopayNumber] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('creditCard');
     const [error, setError] = useState('');
+    const router = useRouter();
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e:any) => {
         e.preventDefault();
 
         // Basic validation
@@ -58,7 +60,7 @@ export default function PaymentForm({ totalPrice, eventId, tierId, quantity }) {
             const result = await response.json();
             if (result.status === 'success') {
                 // Handle success (e.g., redirect to a success page)
-                console.log('Payment successful');
+                router.push('/events/payment/success')
             } else {
                 setError(result.msg || 'Payment processing failed');
             }
@@ -196,6 +198,7 @@ export default function PaymentForm({ totalPrice, eventId, tierId, quantity }) {
             </div>
             {error && <p className="text-red-500 mb-4">{error}</p>}
             <button
+
                 type="submit"
                 className="w-full bg-gray-800 text-white p-2 rounded mb-8"
             >
