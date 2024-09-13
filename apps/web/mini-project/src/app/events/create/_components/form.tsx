@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import RichTextEditor from "./editor";
 import { Formik, FormikHelpers, FormikValues, useFormik } from "formik";
@@ -13,6 +13,9 @@ import { Event } from "@/types/events";
 import DatePicker from "react-datepicker";
 import FieldDesc from "@/components/Form/FieldDesc";
 import DatePickerField from "@/components/Form/DatePicker";
+import { createEvent } from "@/lib/events";
+import { useRouter } from "next/navigation";
+import { useSnackbar } from "notistack";
 
 
 export const eventSchema = Yup.object({
@@ -45,9 +48,7 @@ export const eventSchema = Yup.object({
     }),
   ticket_end_date: Yup.date()
     .required('Ticket end date is required')
-    .min(Yup.ref('ticket_start_date'), 'Ticket end date must be after ticket start date'),
-  created_date: Yup.date(),
-  modified_date: Yup.date(),
+    .min(Yup.ref('ticket_start_date'), 'Ticket end date must be after ticket start date')
 });
 
 const initialValues: Event = {
@@ -70,9 +71,67 @@ const initialValues: Event = {
 
 
 export const FormCreate: React.FC = () => {
-  const onCreate = async (data: Event) => {
+  const router = useRouter();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+
+  const onCreate = async (data: any) => {
     try {
       console.log(data);
+
+      const composeTiers = () => {
+        if (data.event_type == 'free') {
+          return [
+            {
+              tier_name: 'regular',
+              price: 0,
+              max_capacity: Number(data.free_quantity),
+            }
+          ]
+        } else {
+          return [
+            {
+              tier_name: 'VIP',
+              max_capacity: Number(data.paid_vip_quantity),
+              price: Number(data.paid_vip_price)
+            },
+            {
+              tier_name: 'regular',
+              max_capacity: Number(data.paid_regular_quantity),
+              price: Number(data.paid_regular_price)
+            }
+          ]
+        }
+      }
+
+      let formData = new FormData();
+      formData.append('name', data.name);
+      formData.append('event_date', data.event_date);
+      formData.append('location', data.location);
+      formData.append('venue', data.venue);
+      formData.append('category', data.category);
+      formData.append('event_type', data.event_type);
+      formData.append('event_description', data.event_description);
+      formData.append('ticket_start_date', data.ticket_start_date);
+      formData.append('ticket_end_date', data.ticket_end_date);
+      formData.append('image', data.image);
+      formData.append('tiers', JSON.stringify(composeTiers()));
+
+      const response = await createEvent(formData);
+      const result = response.result;
+
+      if (result.status) {
+        enqueueSnackbar({
+          message: 'Event has been created!',
+          anchorOrigin: {
+            horizontal: 'center',
+            vertical: 'bottom'
+          }
+        })
+        setTimeout(() => {
+          router.push('/');
+        }, 1000);
+        
+      }
     } catch (err) {
       console.log(err);
     }
@@ -83,7 +142,7 @@ export const FormCreate: React.FC = () => {
     validationSchema: eventSchema,
     onSubmit: (values, actions) => {
       onCreate(values);
-      actions.resetForm();
+      // actions.resetForm();
     }
   });
 
@@ -94,7 +153,7 @@ export const FormCreate: React.FC = () => {
   
   const handleSubmit = async (values: any) => {
     try {
-      console.log(values);
+      // console.log(values);
       // Handle form submission
     } catch (err) {
       console.error(err);
@@ -132,10 +191,10 @@ export const FormCreate: React.FC = () => {
             formik={formik}
             options={[
               { label: "Select Category", value: "" },
-              { label: "Concert", value: "Concert" },
-              { label: "Musical", value: "Musical" },
-              { label: "Play", value: "Play" },
-              { label: "Classic", value: "Classic" },
+              { label: "Concert", value: "concert" },
+              { label: "Musical", value: "musical" },
+              { label: "Play", value: "play" },
+              { label: "Classic", value: "classic" },
             ]}
           />
           <FieldSelect
@@ -144,31 +203,31 @@ export const FormCreate: React.FC = () => {
             formik={formik}
             options={[
               { label: "Select Event Type", value: "" },
-              { label: "Free", value: "Free" },
-              { label: "Paid", value: "Paid" },
+              { label: "Free", value: "free" },
+              { label: "Paid", value: "paid" },
             ]}
           />
 
           {
-            formik.values.event_type == 'Free' ? (
+            formik.values.event_type == 'free' ? (
             <div className="flex flex-row gap-0.5">
               <FieldText 
-              name="Regular quantity"
+              name="free_quantity"
               formik={formik}
               label="Quantity"
               />
             </div>
             
-            ) : formik.values.event_type == 'Paid' ? (
+            ) : formik.values.event_type == 'paid' ? (
               <div>
               <div className="flex flex-row gap-0.5">
               <FieldText 
-              name="Input quantity"
+              name="paid_regular_quantity"
               formik={formik}
               label="Regular Quantity"
               />
               <FieldText 
-              name="Input price"
+              name="paid_regular_price"
               formik={formik}
               label="Regular Price"
               />
@@ -176,12 +235,12 @@ export const FormCreate: React.FC = () => {
 
             <div className="flex flex-row gap-0.5">
               <FieldText 
-              name="Input quantity"
+              name="paid_vip_quantity"
               formik={formik}
               label="VIP Quantity"
               />
               <FieldText 
-              name="Input price"
+              name="paid_vip_price"
               formik={formik}
               label="VIP Price"
               />

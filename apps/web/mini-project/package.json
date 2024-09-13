@@ -13,6 +13,7 @@
     "@types/react-datepicker": "^7.0.0",
     "formik": "^2.4.6",
     "next": "14.2.6",
+    "notistack": "^3.0.1",
     "react": "^18",
     "react-dom": "^18",
     "react-quill": "^0.0.2",

@@ -7,6 +7,7 @@ import Hero from './hero/page';
 import { formatDate } from './helper/formatDate';
 import { getEventsPaginated, getMasterLocations } from '@/lib/events';
 import Pagination from '@/components/pagination';
+import Image from 'next/image';
 
 export default function Home({
   searchParams,
@@ -29,7 +30,7 @@ export default function Home({
 
   useEffect(() => {
     const fetchMasterLocations = async () => {
-      const response = await getMasterLocations();
+      const response = await getMasterLocations("");
       console.log(JSON.stringify(response));
       const data = response.result;
       const masterLocations = data.locations.map((item:any) => item.location);
@@ -107,7 +108,11 @@ export default function Home({
               <Link key={event.id} href={`/events/${event.id}`}>
                 <div className="relative bg-white border border-gray-200 shadow-lg flex flex-col transition-transform transform hover:scale-105 p-4" style={{ width: '100%', paddingBottom: '150%' }}>
                   <div className="absolute inset-0 flex flex-col">
-                    <img src={event.image} alt={event.name} className="w-full h-3/4 object-cover mb-1" style={{ height: '68%' }} />
+                    {
+                      event.image.startsWith('http') ? 
+                      (<img src={event.image} alt={event.name} className="w-full h-3/4 object-cover mb-1" style={{ height: '68%' }} />) 
+                      : (<Image width={1280} height={1280} src={`/${event.image}`} alt={event.name} className="w-full h-3/4 object-cover mb-1" style={{ height: '68%' }} />)
+                    }
                     <div className="flex flex-col flex-grow px-4 pt-2" style={{ height: '10%' }}>
                       <h2 className="text-lg font-semibold text-gray-900 mb-1">{event.name}</h2>
                       <p className="text-gray-600 text-sm mb-1">{formatDate(event.event_date)}</p>
