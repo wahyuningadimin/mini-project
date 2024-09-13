@@ -1,26 +1,29 @@
-import { Router } from "express";
-import { uploader } from "../middlewares/uploader";
-// import { verifyToken } from "../middlewares/token";
-import { EventController } from "@/controllers/event.controller";
+import { Router, Request, Response } from 'express';
 
 export class EventRouter {
-    private router: Router;
-    private eventController: EventController;
+  public router: Router;
 
-    constructor() {
-        this.eventController = new EventController()
-        this.router = Router()
-        this.initializeRoutes()
-    }
+  constructor() {
+    this.router = Router();
+    this.initializeRoutes();
+  }
 
-    private initializeRoutes(): void {
-        this.router.post('/createEvent', 
-            this.eventController.createEvent
-        )
-        this.router.get('/getEvents', this.eventController.getEvents)
-    }
+  private initializeRoutes(): void {
+    this.router.get('/', this.getAllEvents);
+    this.router.post('/', this.createEvent);
+  }
 
-    getRouter(): Router {
-        return this.router
-    }
+  // Contoh handler untuk mendapatkan semua event
+  private getAllEvents(req: Request, res: Response) {
+    res.json({ message: 'Get all events' });
+  }
+
+  // Contoh handler untuk membuat event baru
+  private createEvent(req: Request, res: Response) {
+    res.json({ message: 'Create new event' });
+  }
+
+  public getRouter(): Router {
+    return this.router;
+  }
 }
