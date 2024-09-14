@@ -1,6 +1,6 @@
 import App from './app';  
 import prisma from './prismaClient';  // Koneksi prisma
-import { authRoutes } from './controllers/auth.controller';  // Mengimpor authRoutes
+// import { authRoutes } from './controllers/auth.controller';  // Mengimpor authRoutes
 
 const main = async () => {
   try {
@@ -10,7 +10,7 @@ const main = async () => {
 
     const app = new App();  // Membuat instance dari kelas 'App'
 
-    app.app.use('/auth', authRoutes);  // Menambahkan rute auth ke aplikasi
+    // app.app.use('/auth', authRoutes);  // Menambahkan rute auth ke aplikasi
 
     app.start();  // Memulai aplikasi
   } catch (error) {

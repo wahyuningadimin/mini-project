@@ -2,8 +2,10 @@ import express, { json, urlencoded, Express, Request, Response, NextFunction } f
 import cors from 'cors';
 import { PORT } from './config';
 import { EventRouter } from './routers/event.router';  // pastikan path benar
-import authRoutes from './routers/auth.routes';
-import { authMiddleware, roleMiddleware } from './middlewares/auth.middleware';
+import authRouter from './routers/auth.router';
+import { authMiddleware } from './middlewares/auth.middleware';
+import { roleMiddleware } from './middlewares/role.middleware';
+import { PointRouter } from './routers/point.router';
 
 export default class App {
   public app: Express;
@@ -42,6 +44,7 @@ export default class App {
 
   private routes(): void {
     const eventRouter = new EventRouter();  // Instantiate EventRouter
+    const pointRouter = new PointRouter();
 
     // Public route
     this.app.get('/api', (req: Request, res: Response) => {
@@ -49,8 +52,14 @@ export default class App {
     });
 
     // Protecting the /api/events route using authMiddleware
-    this.app.use('/api/events', authMiddleware, eventRouter.getRouter());  // Use getRouter()
+    this.app.use('/api/events', eventRouter.getRouter());  // Use getRouter()
+    this.app.use('/api/auth', authRouter);
+    this.app.use('/api/points', pointRouter.getRouter());
 
+
+
+
+    
     // Example for protected routes with roleMiddleware
     this.app.get(
       '/api/customer-area',

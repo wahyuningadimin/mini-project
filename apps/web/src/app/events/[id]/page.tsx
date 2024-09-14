@@ -6,18 +6,17 @@ import Link from "next/link";
 
 export const revalidate = 3600;
 
-export const generateStaticParams = async () => {
-    const { events } = await getEvents();
-    return events.map((event: { id: number }) => ({
-        params: {
-            id: event.id.toString(),
-        },
-    }));
-};
+// export const generateStaticParams = async () => {
+//     const { events } = await getEvents();
+//     return events.map((event: { id: number }) => ({
+//         params: {
+//             id: event.id.toString(),
+//         },
+//     }));
+// };
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
-    const { events } = await getEvents();
-    const event = events.find((event: { id: number }) => event.id.toString() === params.id);
+    const { event } = await getEventbyId(params.id);
 
     if (!event) {
         return {

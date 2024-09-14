@@ -2,27 +2,47 @@ import { Request, Response } from 'express';
 import prisma from '../prismaClient';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { generateReferralCode } from './referral.service';
 
 // Fungsi untuk register user
 export const registerUser = async (req: Request, res: Response) => {
   try {
-    const { name, fullName, email, password, role, referralCode } = req.body;
+    const { name, fullName, email, password, role } = req.body;
 
     // Hash password menggunakan bcrypt
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    // Validasi email untuk user yang existing
+    const existingUser = await prisma.users.findUnique({
+      where: {
+        email: email
+      }
+    })
+
+    if (existingUser) {
+      res.status(500).json({ error: `User with email ${email} already exists!`});
+      return;
+    }
+
     // Membuat user baru di database menggunakan Prisma Client
     const user = await prisma.users.create({
       data: {
-        name, // Properti name harus sesuai dengan schema.prisma
+        name,// Properti name harus sesuai dengan schema.prisma
         fullName,
         email,
         password: hashedPassword, // Simpan password yang sudah di-hash
         role,
-        referral_code: referralCode, // Pastikan ini juga sesuai dengan schema
+        referral_code: generateReferralCode(fullName), // Pastikan ini juga sesuai dengan schema
       },
     });
+
+    // Tambahkan 10.000 point untuk user yang referral code nya dipakai
+    // Cari user id nya WHERE referral_code = req.body.referral_code
+
+    // Insert ke tx_users_point
+    
+
 
     // Response ketika berhasil
     res.status(201).json({ message: 'User registered successfully', user });
