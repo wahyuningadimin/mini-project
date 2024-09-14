@@ -12,6 +12,9 @@
   "devDependencies": {
     "@commitlint/cli": "^18.4.2",
     "@commitlint/config-conventional": "^18.4.2",
+    "@types/bcrypt": "^5.0.2",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.6",
     "eslint": "^8.48.0",
     "husky": "^8.0.0",
     "lint-staged": "^15.1.0",
@@ -32,7 +35,11 @@
     }
   },
   "dependencies": {
+    "@prisma/client": "^5.19.1",
     "@types/axios": "^0.14.0",
-    "axios": "^1.7.2"
+    "axios": "^1.7.2",
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2"
   }
 }

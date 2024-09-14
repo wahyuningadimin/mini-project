@@ -126,13 +126,3 @@ enum PaymentStatus {
   pending
   paid
 }
-
-
-model TransactionDetails {
-  id                Int      @id @default(autoincrement())
-  event_id          Int
-  transaction_id    Int
-  tier_id           Int
-  quantity          Int
-  @@map("tx_transaction_details")
-}

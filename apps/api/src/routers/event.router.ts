@@ -1,17 +1,16 @@
-import { Router } from "express";
-import { uploader } from "../middlewares/uploader";
-// import { verifyToken } from "../middlewares/token";
-import { EventController } from "@/controllers/event.controller";
+import { Router, Request, Response } from 'express';
+import { EventController } from '@/controllers/event.controller';
+
 
 export class EventRouter {
-    private router: Router;
-    private eventController: EventController;
+  public router: Router;
+  private eventController: EventController;
 
-    constructor() {
-        this.eventController = new EventController()
-        this.router = Router()
-        this.initializeRoutes()
-    }
+  constructor() {
+    this.eventController = new EventController()
+    this.router = Router();
+    this.initializeRoutes();
+  }
 
     private initializeRoutes(): void {
         this.router.post('/createEvent', this.eventController.createEvent)
@@ -25,7 +24,7 @@ export class EventRouter {
         this.router.delete('/:id', this.eventController.deleteEvent)
     }
 
-    getRouter(): Router {
-        return this.router
-    }
+  public getRouter(): Router {
+    return this.router;
+  }
 }
