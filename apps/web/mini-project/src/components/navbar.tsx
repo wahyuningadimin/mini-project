@@ -20,7 +20,7 @@ export default function Navbar() {
                 <li><Link href={'/register'}>Register</Link></li>
               </ul>
             </div>
-            <p className="btn btn-ghost text-xl" style={{ paddingLeft: 0 }}><Link href={'/'}>Festiva</Link></p>
+            <p className="btn btn-ghost text-xl pl-0"><Link href={'/'}>Festiva</Link></p>
           </div>
           <div className="navbar-end hidden lg:flex">
             <ul className="menu menu-horizontal">

@@ -8,6 +8,7 @@ import { formatDate } from './helper/formatDate';
 import { getEventsPaginated, getMasterLocations } from '@/lib/events';
 import Pagination from '@/components/pagination';
 import Image from 'next/image';
+import HeroCarousel from './hero carousel/page';
 
 export default function Home({
   searchParams,
@@ -76,7 +77,7 @@ export default function Home({
 
   return (
     <>
-      <Hero />
+      <HeroCarousel />
       <div className="container mx-auto px-4">
         <header className="m-8">
           <h1 className="text-2xl font-bold mb-4 text-center">Upcoming Events</h1>

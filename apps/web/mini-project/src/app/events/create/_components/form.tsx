@@ -9,7 +9,7 @@ import FieldSelect from "@/components/Form/FieldSelect";
 import { createSlug } from "@/app/helper/createSlug";
 import { FieldImage } from "@/components/Form/FieldImage";
 import * as Yup from 'yup';
-import { Event } from "@/types/events";
+import { Event, EventPrice } from "@/types/events";
 import DatePicker from "react-datepicker";
 import FieldDesc from "@/components/Form/FieldDesc";
 import DatePickerField from "@/components/Form/DatePicker";
@@ -48,10 +48,40 @@ export const eventSchema = Yup.object({
     }),
   ticket_end_date: Yup.date()
     .required('Ticket end date is required')
-    .min(Yup.ref('ticket_start_date'), 'Ticket end date must be after ticket start date')
+    .min(Yup.ref('ticket_start_date'), 'Ticket end date must be after ticket start date'),
+  // free_quantity: Yup.number()
+  //   .when('event_type', {
+  //     is: 'free',
+  //     then: Yup.number().required('Quantity is required').positive('Quantity must be a positive number'),
+  //     otherwise: Yup.number().notRequired(),
+  //   }),
+  // paid_regular_quantity: Yup.number()
+  //   .when('event_type', {
+  //     is: 'paid',
+  //     then: Yup.number().required('Regular quantity is required').positive('Regular quantity must be a positive number'),
+  //     otherwise: Yup.number().notRequired(),
+  //   }),
+  // paid_regular_price: Yup.number()
+  //   .when('event_type', {
+  //     is: 'paid',
+  //     then: Yup.number().required('Regular price is required').positive('Regular price must be a positive number'),
+  //     otherwise: Yup.number().notRequired(),
+  //   }),
+  // paid_vip_quantity: Yup.number()
+  //   .when('event_type', {
+  //     is: 'paid',
+  //     then: Yup.number().required('VIP quantity is required').positive('VIP quantity must be a positive number'),
+  //     otherwise: Yup.number().notRequired(),
+  //   }),
+  // paid_vip_price: Yup.number()
+  //   .when('event_type', {
+  //     is: 'paid',
+  //     then: Yup.number().required('VIP price is required').positive('VIP price must be a positive number'),
+  //     otherwise: Yup.number().notRequired(),
+  //   }),
 });
 
-const initialValues: Event = {
+const initialValues: any = {
   name: '',
   event_date: '',
   location: '',
@@ -66,6 +96,11 @@ const initialValues: Event = {
   modified_date: '',
   id: 0,
   slug: "",
+  free_quantity: '',
+  paid_regular_quantity: '',
+  paid_regular_price: '',
+  paid_vip_quantity: '',
+  paid_vip_price: '',
 };
 
 
