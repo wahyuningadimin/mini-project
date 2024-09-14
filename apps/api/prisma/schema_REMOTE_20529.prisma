@@ -7,13 +7,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Sample {
+  id        Int      @id @default(autoincrement())
+  name      String
+  code      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("samples")
+}
+
 model Users {
   id            Int      @id @default(autoincrement())
   password      String
   role          String
   email         String   @unique
   created_date  DateTime @default(now())
-  modified_date DateTime @default(now())
+  updatedAt     DateTime @updatedAt
   referral_code String?  @unique
   points        UsersPoints[]  // Relasi dengan UsersPoints
   fullName      String
@@ -68,7 +78,7 @@ model UsersPoints {
   operations   Operations
   points       Int
   created_date DateTime   @default(now())
-  expired_date DateTime?
+  expired_date DateTime
 
   @@map("tx_users_points")
 }
@@ -78,6 +88,7 @@ model Transactions {
   id               Int           @id @default(autoincrement())
   event_id         Int
   user_id          Int
+  tier_id          Int
   promo_code       Int
   points_used      Int
   original_price   Int
@@ -114,14 +125,4 @@ enum PaymentStatus {
   unpaid
   pending
   paid
-}
-
-
-model TransactionDetails {
-  id                Int      @id @default(autoincrement())
-  event_id          Int
-  transaction_id    Int
-  tier_id           Int
-  quantity          Int
-  @@map("tx_transaction_details")
 }

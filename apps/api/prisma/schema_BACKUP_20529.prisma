@@ -7,13 +7,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Sample {
+  id        Int      @id @default(autoincrement())
+  name      String
+  code      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("samples")
+}
+
 model Users {
   id            Int      @id @default(autoincrement())
   password      String
   role          String
   email         String   @unique
   created_date  DateTime @default(now())
-  modified_date DateTime @default(now())
+  updatedAt     DateTime @updatedAt
   referral_code String?  @unique
   points        UsersPoints[]  // Relasi dengan UsersPoints
   fullName      String
@@ -68,7 +78,7 @@ model UsersPoints {
   operations   Operations
   points       Int
   created_date DateTime   @default(now())
-  expired_date DateTime?
+  expired_date DateTime
 
   @@map("tx_users_points")
 }
@@ -78,6 +88,7 @@ model Transactions {
   id               Int           @id @default(autoincrement())
   event_id         Int
   user_id          Int
+  tier_id          Int
   promo_code       Int
   points_used      Int
   original_price   Int
@@ -115,6 +126,77 @@ enum PaymentStatus {
   pending
   paid
 }
+<<<<<<< HEAD
+
+model Users {
+  id       Int      @id @default(autoincrement())
+  username String
+  password String
+  email    String
+  full_name String
+  created_date DateTime @default(now())
+  referral_code String
+  @@map("ms_users")
+}
+
+model Events {
+  id          Int      @id @default(autoincrement())
+  name        String
+  event_date  DateTime
+  location    String
+  venue       String
+  category    Category
+  event_type  EventType
+  event_description String @db.LongText
+  image       String? @map("image")
+  ticket_start_date DateTime
+  ticket_end_date DateTime
+  created_date DateTime
+  modified_date DateTime
+  @@map("ms_events")
+  }
+
+model EventsPrice {
+  id            Int      @id @default(autoincrement())
+  event_id      Int
+  tier_name     TierName
+  max_capacity  Int
+  price         Float
+  @@map("ms_events_price")
+}
+
+model EventsReview {
+  id            Int      @id @default(autoincrement())
+  event_id      Int
+  user_id       Int
+  rating        Int
+  review        String @db.LongText
+  created_date  DateTime
+  @@map("tx_events_review")
+}
+
+model UsersPoints {
+  id           Int      @id @default(autoincrement())
+  user_id      Int
+  operations   Operations
+  points       Int
+  created_date DateTime
+  expired_date DateTime
+  @@map("tx_users_points")
+}
+
+model Transactions {
+  id                Int      @id @default(autoincrement())
+  event_id          Int
+  user_id           Int
+  promo_code        Int
+  points_used       Int
+  original_price    Int
+  discounted_price  Int
+  payment_status    PaymentStatus
+  payment_date      DateTime
+  @@map("tx_transactions")
+}
 
 
 model TransactionDetails {
@@ -125,3 +207,5 @@ model TransactionDetails {
   quantity          Int
   @@map("tx_transaction_details")
 }
+=======
+>>>>>>> 1011b553461d8146e963c715e7d5432a043fa693
