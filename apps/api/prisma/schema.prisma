@@ -9,16 +9,18 @@ datasource db {
 
 model Users {
   id            Int      @id @default(autoincrement())
-  password      String
-  role          String
-  email         String   @unique
-  created_date  DateTime @default(now())
-  modified_date DateTime @default(now())
-  referral_code String?  @unique
-  points        UsersPoints[]  // Relasi dengan UsersPoints
-  fullName      String
   name          String?
-
+  password      String
+  email         String   @unique
+  fullName     String
+  created_date  DateTime @default(now())
+  referral_code String?  @unique
+  discount_active Boolean
+  discount_expiry_date DateTime  @default(dbgenerated("CURRENT_TIMESTAMP + INTERVAL 3 MONTH"))
+  modified_date DateTime @default(now())
+  role          String
+  points        UsersPoints[]  // Relasi dengan UsersPoints
+  
   @@map("ms_users")
 }
 
@@ -36,6 +38,7 @@ model Events {
   ticket_end_date   DateTime
   created_date      DateTime
   modified_date     DateTime
+  created_by        String
 
   @@map("ms_events")
 }

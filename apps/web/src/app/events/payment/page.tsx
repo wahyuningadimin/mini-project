@@ -103,7 +103,27 @@ export default function PaymentPage() {
 
                     {/* Promo Code Input */}
                     <div className="mb-4">
-                        <label htmlFor="promoCode" className="block text-sm font-medium mb-1">Promo Code (Optional)</label>
+                        <label htmlFor="promoCode" className="block text-sm font-medium mb-1">Use Discount</label>
+                        <div className="flex">
+                            <input
+                                type="text"
+                                id="promoCode"
+                                value={promoCode}
+                                onChange={(e) => setPromoCode(e.target.value)}
+                                className="w-full p-2 border border-gray-300 rounded"
+                            />
+                            <button
+                                type="button"
+                                onClick={handlePromoCodeApply}
+                                className="ml-2 bg-blue-500 text-white p-2 rounded"
+                            >
+                                Apply
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="mb-4">
+                        <label htmlFor="promoCode" className="block text-sm font-medium mb-1">Use Points</label>
                         <div className="flex">
                             <input
                                 type="text"

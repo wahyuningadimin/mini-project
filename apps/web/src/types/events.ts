@@ -13,16 +13,22 @@ export interface Event {
     ticket_end_date: string;
     created_date: string;
     modified_date: string;
+    created_by: string;
 }
 
 export interface User {
   id: number;
-  username: string;
+  name: string;
   password: string;
   email: string;
   full_name: string;
   created_date: string;
   referral_code: string;
+  discount_active: boolean;
+  discount_expiry_date: string;
+  modified_date: string;
+  role: string;
+  points: number[];
 }
 
 export interface EventPrice {

@@ -58,6 +58,7 @@ export const createEvent = async (req: Request, res: Response) => {
             const created_date = new Date();
             const modified_date = new Date;
             const image = file.newFilename;
+            const created_by = 'admin'; // Replace with actual user ID
 
             const createdEvent = await prisma.events.create({
                 data: {
@@ -72,7 +73,8 @@ export const createEvent = async (req: Request, res: Response) => {
                     ticket_end_date: new Date(ticket_end_date as string),
                     created_date: created_date,
                     modified_date: modified_date,
-                    image: image
+                    image: image,
+                    created_by: created_by as string
                 }
             })
 
