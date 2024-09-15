@@ -1,5 +1,6 @@
 'use client'; // Ensure this is a client component
 
+import fetchWrapper from '@/lib/fetch-wrapper';
 import { redirect, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -49,7 +50,7 @@ export default function PaymentForm({ totalPrice, eventId, tierId, quantity }) {
 
         // Submit payment data
         try {
-            const response = await fetch('http://localhost:8000/api/events/eventCheckout', {
+            const response = await fetchWrapper('http://localhost:8000/api/events/eventCheckout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -15,6 +15,7 @@ export interface AuthenticatedRequest extends Request {
 // Middleware verifikasi token
 export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const token = req.header('Authorization')?.split(' ')[1];
+  console.log("token is : " + token);
 
   if (!token) {
     return res.status(401).json({ message: 'No token, authorization denied' });

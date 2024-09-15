@@ -25,21 +25,21 @@ export class ReviewController {
             });
 
             // Update event's average rating and review count
-            const reviews = await prisma.eventsReview.findMany({
-                where: { event_id },
-                select: { rating: true }
-            });
+            // const reviews = await prisma.eventsReview.findMany({
+            //     where: { event_id },
+            //     select: { rating: true }
+            // });
 
-            const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
-            const averageRating = totalRating / reviews.length;
+            // const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+            // const averageRating = totalRating / reviews.length;
 
-            await prisma.events.update({
-                where: { id: event_id },
-                data: {
-                    averageRating,
-                    reviewCount: reviews.length
-                }
-            });
+            // await prisma.events.update({
+            //     where: { id: event_id },
+            //     data: {
+            //         averageRating,
+            //         reviewCount: reviews.length
+            //     }
+            // });
 
             res.status(201).send({
                 status: 'ok',

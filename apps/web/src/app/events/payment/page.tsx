@@ -1,9 +1,11 @@
 'use client';
+
 import { useRouter, useSearchParams } from 'next/navigation';
 import Wrapper from '@/components/wrapper';
 import PaymentForm from './_components/form';
 import { useEffect, useState } from 'react';
 import { getEventbyId, getEventTiers } from '@/lib/events';
+import Switch from "react-switch";
 
 export default function PaymentPage() {
     const router = useRouter();
@@ -16,6 +18,8 @@ export default function PaymentPage() {
     const [promoCode, setPromoCode] = useState<string>('');
     const [discount, setDiscount] = useState<number>(0); // Assuming discount is a percentage
     const [finalPrice, setFinalPrice] = useState<number>(0);
+    const [usePoints, setUsePoints] = useState<boolean>(false); // Manage the switch state
+    const [availablePoints, setAvailablePoints] = useState<number>(100); // Example value, replace with real data
 
     useEffect(() => {
         const id = searchParams.get('id');
@@ -81,7 +85,7 @@ export default function PaymentPage() {
                                 className="w-full p-2 border border-gray-300 rounded"
                             >
                                 {tiers.map(tier => (
-                                    <option key={tier.tier_name} value={tier.id}>{tier.tier_name}</option>
+                                    <option key={tier.id} value={tier.id}>{tier.tier_name}</option>
                                 ))}
                             </select>
                         </div>
@@ -103,7 +107,7 @@ export default function PaymentPage() {
 
                     {/* Promo Code Input */}
                     <div className="mb-4">
-                        <label htmlFor="promoCode" className="block text-sm font-medium mb-1">Use Discount</label>
+                        <label htmlFor="promoCode" className="block text-sm font-medium mb-1">Discount Code</label>
                         <div className="flex">
                             <input
                                 type="text"
@@ -122,23 +126,18 @@ export default function PaymentPage() {
                         </div>
                     </div>
 
+                    {/* Points Switch */}
                     <div className="mb-4">
-                        <label htmlFor="promoCode" className="block text-sm font-medium mb-1">Use Points</label>
-                        <div className="flex">
-                            <input
-                                type="text"
-                                id="promoCode"
-                                value={promoCode}
-                                onChange={(e) => setPromoCode(e.target.value)}
-                                className="w-full p-2 border border-gray-300 rounded"
+                        <label className="block text-sm font-medium mb-1">Redeem Points</label>
+                        <div className="flex items-center">
+                            <span className="mr-8">Available Points: {availablePoints}</span> {/* Added margin-right */}
+                            <Switch
+                                onChange={(checked) => setUsePoints(checked)}
+                                checked={usePoints}
+                                offColor="#888"
+                                onColor="#0d6efd"
+                                className=''
                             />
-                            <button
-                                type="button"
-                                onClick={handlePromoCodeApply}
-                                className="ml-2 bg-blue-500 text-white p-2 rounded"
-                            >
-                                Apply
-                            </button>
                         </div>
                     </div>
 

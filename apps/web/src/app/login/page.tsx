@@ -2,7 +2,7 @@
 
 import { loginUser } from "@/lib/register";
 import { Login } from "@/types/login";
-import { createToken } from "@/lib/server";
+import { saveRole, saveToken } from "@/lib/server";
 import { ErrorMessage, Field, Form, Formik, FormikHelpers } from "formik";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
@@ -24,7 +24,8 @@ export default function LoginForm() {
             if (!ok) throw result.msg
             toast.success(result.msg)
             action.resetForm()
-            await createToken(result.token) // Ensure createToken is awaited if it's asynchronous
+            await saveToken(result.token)
+            await saveRole(result.role) 
             router.push('/')
         } catch (err) {
             console.log(err);
