@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/navbar";
-import Footer from "@/components/Footer";
+import Footer from "@/components/footer";
+import { ToastContainer } from "react-toastify";
+import { AuthProvider } from "@/context/AuthContext";
+import SnackbarProviderWrapper from "@/components/snackbarProviderWrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,9 +22,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-          <Navbar />
-          {children}
-          <Footer />
+        <AuthProvider>
+          <SnackbarProviderWrapper>
+            <Navbar />
+            {children}
+            <Footer />
+          </SnackbarProviderWrapper>
+        </AuthProvider>
       </body>
 
     </html>

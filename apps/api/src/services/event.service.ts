@@ -2,9 +2,10 @@ import { Request, Response } from 'express';
 import prisma from "../prisma";
 import path from 'path';
 import fs from 'fs';
-import { Category, EventType, TierName } from "@prisma/client";
+import { Category, EventType, Operations, TierName } from "@prisma/client";
 import { Formidable, File } from 'formidable';
-import { addPoints } from './point.service';
+import { addPoints, redeemPoints } from './point.service';
+import { AuthenticatedRequest } from '@/middlewares/auth.middleware';
 
 export const createEvent = async (req: Request, res: Response) => {
     // File image di-save di folder apa
@@ -171,6 +172,7 @@ export const getEventsPaginated = async (req: Request, res: Response) => {
         const query = req.query.query == "" ? undefined : req.query.query as string;
         const category = req.query.category == "" ? undefined : req.query.category as Category;
         const location = req.query.location == "" ? undefined : req.query.location as string;
+        const today = new Date();
 
         console.log(`${JSON.stringify(req.query)}`);
 
@@ -191,7 +193,16 @@ export const getEventsPaginated = async (req: Request, res: Response) => {
                     contains: query
                 },
                 category: category,
-                location: location
+                location: location,
+                ticket_start_date: {
+                    lte: today
+                },
+                ticket_end_date: {
+                    gte: today
+                },
+                event_date: {
+                    gte: today
+                }
             },
             orderBy: {
                 event_date: 'asc',
@@ -285,12 +296,21 @@ export const getEventTiers = async (req: Request, res: Response) => {
 export const eventCheckout = async (req: Request, res: Response) => {
     try {
         // Receiving data from the API request
-        const { userId, eventId, promoCode, pointsUsed, paymentMethod, tickets } = req.body;
+        const { eventId, paymentMethod, tickets, useDiscount, usePoints } = req.body;
+        const user = (req as AuthenticatedRequest).user;
+        const userId = user?.userId;
+
+        if (!user) {
+            res.status(400).send({
+                status: 'error',
+                msg: 'Unable to find user!'
+            });
+        }
 
         // Validate the userId into database. User should exist, otherwise, we can not verify the ownership of the ticket
         // First, get the user from DB using the userId from API
         const userFromDB = await prisma.users.findUnique({
-            where: { id: Number(userId) }
+            where: { id: Number(user?.userId) || 0 }
         })
 
         // Next, check if the userFromDB doesn't exist. If it doesn't, return error
@@ -315,6 +335,8 @@ export const eventCheckout = async (req: Request, res: Response) => {
         }
 
         let totalPrice = 0;
+        let discountedPrice = 0;
+        let activePoints = 0;
         // Check if event is free or paid. If paid, calculate the price
         if (eventFromDB && eventFromDB.event_type.toLowerCase() === 'paid') {
             // Get the tier prices for event
@@ -341,16 +363,68 @@ export const eventCheckout = async (req: Request, res: Response) => {
                     totalPrice += matchingTier.price * ticket.quantity;
                 }
             })
+
+            discountedPrice = totalPrice;
+
+            if (useDiscount) {
+                discountedPrice = totalPrice * 0.9;
+
+                await prisma.users.update({
+                    where: {
+                        id: Number(userId)
+                    },
+                    data: {
+                        discount_active: false
+                    }
+                })
+            }
+
+            if (usePoints) {
+                const totalAddPoints = await prisma.usersPoints.aggregate({
+                    _sum: {
+                        points: true,
+                    },
+                    where: {
+                        user_id: Number(userId),
+                        operations: 'add',
+                        expired_date: {
+                            gte: new Date(),
+                        },
+                    },
+                });
+        
+                const totalSubtractPoints = await prisma.usersPoints.aggregate({
+                    _sum: {
+                        points: true,
+                    },
+                    where: {
+                        user_id: Number(userId),
+                        operations: 'subtract',
+                        expired_date: {
+                            gte: new Date()
+                        },
+                    },
+                });
+        
+                activePoints =
+                    (totalAddPoints._sum.points || 0) - (totalSubtractPoints._sum.points || 0);
+
+                const successRedeem = await redeemPoint(userId, activePoints);
+
+                if (successRedeem) {
+                    discountedPrice = discountedPrice - activePoints;
+                } 
+            }
         }
 
         // Compose the tx_transaction object to be inserted
         const newTransaction: any = {
             event_id: eventId,
             user_id: userId,
-            promo_code: promoCode,
-            points_used: pointsUsed,
+            promo_code: 0,
+            points_used: activePoints,
             original_price: totalPrice,
-            discounted_price: totalPrice, // Need to be adjusted to calculate the promo
+            discounted_price: discountedPrice, // Need to be adjusted to calculate the promo
             payment_status: 'paid',
             payment_date: new Date()
         }
@@ -447,4 +521,57 @@ export const deleteEvent = async (req: Request, res: Response) => {
             msg: 'An error occurred while deleting the event',
         });
     }
+}
+
+export const getUserEvents = (req: Request, res: Response) => {
+    const user = (req as AuthenticatedRequest).user;
+
+    if (!user) {
+        res.status(400).send({
+            error: 'Can not find user'
+        });
+    }
+}
+
+const redeemPoint = async (userId: string|undefined, points: number) => {
+    const availablePoints = await prisma.usersPoints.findMany({
+        where: {
+            user_id: Number(userId),
+            operations: Operations.add,
+            expired_date: {
+                gte: new Date(),
+            },
+        },
+        orderBy: {
+            expired_date: 'asc',
+        },
+    });
+
+    let remainingPointsToSubtract = points;
+    let totalAvailablePoints = 0;
+    let lastExpirationDate = null;
+
+    for (const pointEntry of availablePoints) {
+        totalAvailablePoints += pointEntry.points;
+        lastExpirationDate = pointEntry.expired_date;
+
+        if (totalAvailablePoints >= remainingPointsToSubtract) {
+            break;
+        }
+    }
+
+    if (totalAvailablePoints < remainingPointsToSubtract) {
+        return false;
+    }
+
+    await prisma.usersPoints.create({
+        data: {
+            user_id: Number(userId),
+            operations: Operations.subtract,
+            points: points,
+            expired_date: lastExpirationDate,
+        },
+    });
+
+    return true;
 }

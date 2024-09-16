@@ -1,12 +1,16 @@
 'use client'
 
+import { useAuth } from "@/context/AuthContext";
 import { getRole, getToken } from "@/lib/server"
 import Link from "next/link"
+import Dropdown from "./dropdown";
 
 export default function Navbar() {
   const token = getToken();
   const role = getRole();
   const isLogin = token ? true : false;
+
+  const { user, logout } = useAuth();
 
   return (
     <div >
@@ -22,36 +26,39 @@ export default function Navbar() {
               <ul
                 tabIndex={0}
                 className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
-                { role == "ORGANIZER" ? (
+                {user && user.role == "ORGANIZER" ? (
                   <li><Link href={'/events/create'}>Create Event</Link></li>
                 ) : null}
-                
-                { isLogin ? (
-                  <img className="w-10 h-10 p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500" src="/avt.jpg" alt="Bordered avatar" />
+
+                {user && user.userId ? (
+                  <li><p>Welcome, <strong>{user.name}</strong>!</p></li>
                 ) : (
                   <>
                     <li><Link href={'/login'}>Log In</Link></li>
                     <li><Link href={'/register/customer'}>Register</Link></li>
                   </>
                 )}
-                
+
               </ul>
             </div>
             <p className="btn btn-ghost text-xl pl-0"><Link href={'/'}>Festiva</Link></p>
           </div>
           <div className="navbar-end hidden lg:flex">
             <ul className="menu menu-horizontal">
-            { role == "ORGANIZER" ? (
-                  <li><Link href={'/events/create'}>Create Event</Link></li>
-                ) : null}
-              { isLogin ? (
-                <img className="w-10 h-10 p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500" src="/bruno-mars.jpeg" alt="Bordered avatar" />
+              {user && user.role == "ORGANIZER" ? (
+                <li><Link href={'/events/create'}>Create Event</Link></li>
+              ) : null}
+              {user && user.userId ? (
+                <>
+                  <li className="flex-row"><p>Welcome,<strong>{user.name?.trim()}</strong>!</p><Dropdown /></li>
+                </>
+
               ) : (
-                  <>
-                    <li><Link href={'/login'}>Log In</Link></li>
-                    <li><Link href={'/register/customer'}>Register</Link></li>
-                  </>
-                )}
+                <>
+                  <li><Link href={'/login'}>Log In</Link></li>
+                  <li><Link href={'/register/customer'}>Register</Link></li>
+                </>
+              )}
             </ul>
           </div>
         </div>

@@ -44,7 +44,7 @@ const fetchWrapper = async (
     // Handle non-2xx responses
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'An error occurred');
+      throw new Error(error.error || 'An error occurred');
     }
 
     // Return the JSON response

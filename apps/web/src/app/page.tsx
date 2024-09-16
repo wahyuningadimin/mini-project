@@ -9,6 +9,7 @@ import { getEventsPaginated, getMasterLocations } from '@/lib/events';
 import Pagination from '@/components/pagination';
 import Image from 'next/image';
 import HeroCarousel from './hero carousel/page';
+import { enqueueSnackbar, SnackbarProvider } from 'notistack';
 
 export default function Home({
   searchParams,

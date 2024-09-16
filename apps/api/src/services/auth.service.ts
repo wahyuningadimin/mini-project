@@ -98,7 +98,7 @@ export const loginUser = async (req: Request, res: Response) => {
       { expiresIn: '1h' },
     );
 
-    res.json({ token, role: user.role });
+    res.json({ token, role: user.role, name: user.fullName.split(" ")[0], email: user.email });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
