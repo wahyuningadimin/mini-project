@@ -184,7 +184,16 @@ export const getEventsPaginated = async (req: Request, res: Response) => {
                     contains: query
                 },
                 category: category,
-                location: location
+                location: location,
+                ticket_start_date: {
+                    lte: today
+                },
+                ticket_end_date: {
+                    gte: today
+                },
+                event_date: {
+                    gte: today
+                }
             }
         });
         const paginatedData = await prisma.events.findMany({

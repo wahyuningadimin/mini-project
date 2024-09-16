@@ -7,6 +7,7 @@ import { authMiddleware } from './middlewares/auth.middleware';
 import { roleMiddleware } from './middlewares/role.middleware';
 import { PointRouter } from './routers/point.router';
 import userRouter from './routers/user.router';
+import { ReviewRouter } from './routers/review.router';
 
 export default class App {
   public app: Express;
@@ -21,7 +22,8 @@ export default class App {
   private configure(): void {
     this.app.use(cors());
     this.app.use(json());
-    this.app.use(urlencoded({ extended: true }));
+    this.app.use(express.urlencoded({ limit: '50mb', extended: true }));
+    this.app.use(express.json({limit: '50mb'}));
   }
 
   private handleError(): void {
@@ -35,8 +37,10 @@ export default class App {
 
     this.app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
       if (req.path.includes('/api/')) {
-        console.error('Error : ', err.stack);
-        res.status(500).send('Error !');
+        console.error(err.stack);
+        res.status(500).send({
+          error: err.stack
+        });
       } else {
         next();
       }
@@ -46,6 +50,7 @@ export default class App {
   private routes(): void {
     const eventRouter = new EventRouter();  // Instantiate EventRouter
     const pointRouter = new PointRouter();
+    const reviewRouter = new ReviewRouter();
 
     // Public route
     this.app.get('/api', (req: Request, res: Response) => {
@@ -57,6 +62,7 @@ export default class App {
     this.app.use('/api/auth', authRouter);
     this.app.use('/api/points', pointRouter.getRouter());
     this.app.use('/api/users', userRouter);
+    this.app.use('/api/review', reviewRouter.getRouter());
 
     
     // Example for protected routes with roleMiddleware
