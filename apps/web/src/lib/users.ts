@@ -15,3 +15,10 @@ export const getUserDiscount = async () => {
 
     return { result, discountActive: result.discountActive, ok: res.ok }
 }
+
+export const getUserEvents = async () => {
+    const res = await fetchWrapper(`${base_url}/users/getUserEvents`, { cache: 'no-cache', method: 'GET' })
+    const result = await res.json()
+
+    return { result, events: result.categorizedEvent, ok: res.ok }
+}

@@ -40,14 +40,29 @@ export const getUserEvents = async (req: Request, res: Response) => {
     }
 
     let transactions: any = await prisma.$queryRaw`
-        SELECT a.*, b.* FROM tx_transactions a
-        LEFT JOIN ms_events b ON a.event_id = b.id
+        SELECT DISTINCT(a.event_id), b.*, c.rating FROM tx_transactions a 
+        LEFT JOIN ms_events b ON a.event_id = b.id 
+        LEFT JOIN tx_events_review c ON (a.user_id = c.user_id AND a.event_id = c.event_id) 
         WHERE a.user_id = ${user?.userId || 0}
     `;
 
-    // const mappedTransaction = transactions.map((data) => {
-    //     return {
+    const currentDate = new Date();
 
-    //     }
-    // })
+    console.log(transactions);
+
+    const categorizedEvent = transactions.reduce((acc: any, event: any) => {
+        const eventDate = new Date(event.event_date);
+
+        if (eventDate < currentDate) {
+            acc.past.push(event);
+        } else {
+            acc.upcoming.push(event);
+        }
+
+        return acc;
+    }, {past: [], upcoming: []})
+
+    res.status(200).json({
+        categorizedEvent
+    })
 }
