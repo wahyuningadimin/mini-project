@@ -2,26 +2,40 @@
 import { regUser } from "@/lib/register";
 import { User } from "@/types/events";
 import { ErrorMessage, Field, Form, Formik, FormikHelpers } from "formik";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import * as yup from 'yup';
 
 // Validation schema using Yup
 const registerSchema = yup.object().shape({
     fullName: yup.string().required("Full name is required"),
-    name: yup.string(),
+    // name: yup.string(),
     password: yup.string()
       .min(6, "Password must be at least 6 characters")
       .required("Password is required"),
     email: yup.string().email("Invalid email").required("Email is required"),
-    createdDate: yup.string(),
-    referralCode: yup.string(),
-    role: yup.string().required("Role is required")
+    // createdDate: yup.string(),
+    referral_code: yup.string(),
+    // role: yup.string().required("Role is required")
 });
 
+const initialValues: User = {
+    // name: "",
+    fullName: "",
+    email: "",
+    password: "",
+    // role: "",
+    referral_code: ""
+}
+
 // Function to handle registration
-const onRegister = async (data: User, action: FormikHelpers<User>) => {
+const onRegister = async (data: User, type: string, action: FormikHelpers<User>) => {
     try {
-        const { result, ok } = await regUser(data);
+        let dataToSend = data;
+        dataToSend.role = type;
+
+        const { result, ok } = await regUser(dataToSend);
         if (!ok) throw result.msg;
         toast.success(result.msg);
         action.resetForm();
@@ -31,26 +45,37 @@ const onRegister = async (data: User, action: FormikHelpers<User>) => {
     }
 };
 
-export default function RegisterForm() {
+export default function RegisterForm({ params }: { params: { type: string } }) {
+    const type = params.type;
+    const router = useRouter();
+
+    // localhost:3000/register/customer
+    // localhost:3000/register/organizer
+
+    switch (type) {
+        case "customer":
+            break;
+        case "organizer":
+            break;
+        case "admin":
+            break;
+        default:
+            router.push('/');
+            break;
+    }
+
     return (
         <Formik
-            initialValues={{
-                name: "",
-                fullName: "",
-                email: "",
-                password: "",
-                role: "",
-                referralCode: ""
-            }}
+            initialValues={initialValues}
             validationSchema={registerSchema}
-            onSubmit={(values, action) => {
-                onRegister(values, action);
+            onSubmit={(values: User, action) => {
+                onRegister(values, type, action);
             }}
         >
             {() => (
                     <Form className="flex flex-col items-center justify-center min-h-screen p-6 bg-gray-50"> {/* Gray background for outer container */}
                     <div className="w-full max-w-lg bg-white p-8 rounded-lg shadow-lg"> {/* White background for form container */}
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Register</h2>
+                        <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center capitalize">{type} Registration</h2>
                 
                         <div className="mb-4">
                             <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">Full Name</label>
@@ -63,7 +88,7 @@ export default function RegisterForm() {
                             <ErrorMessage name="fullName" component="div" className="text-sm text-red-500 mt-1" />
                         </div>
                 
-                        <div className="mb-4">
+                        {/* <div className="mb-4">
                             <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
                             <Field
                                 id="name"
@@ -72,7 +97,7 @@ export default function RegisterForm() {
                                 className="mt-1 block w-full rounded-md border border-gray-300 p-2 text-gray-900 shadow-sm placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                             />
                             <ErrorMessage name="name" component="div" className="text-sm text-red-500 mt-1" />
-                        </div>
+                        </div> */}
                 
                         <div className="mb-4">
                             <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
@@ -96,7 +121,7 @@ export default function RegisterForm() {
                             <ErrorMessage name="password" component="div" className="text-sm text-red-500 mt-1" />
                         </div>
                 
-                        <div className="mb-4">
+                        {/* <div className="mb-4">
                             <label htmlFor="role" className="block text-sm font-medium text-gray-700">Role</label>
                             <Field
                                 id="role"
@@ -105,17 +130,20 @@ export default function RegisterForm() {
                                 className="mt-1 block w-full rounded-md border border-gray-300 p-2 text-gray-900 shadow-sm placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                             />
                             <ErrorMessage name="role" component="div" className="text-sm text-red-500 mt-1" />
-                        </div>
+                        </div> */}
                 
-                        <div className="mb-4">
-                            <label htmlFor="referralCode" className="block text-sm font-medium text-gray-700">Referral Code (optional)</label>
-                            <Field
-                                id="referralCode"
-                                name="referralCode"
-                                type="text"
-                                className="mt-1 block w-full rounded-md border border-gray-300 p-2 text-gray-900 shadow-sm placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            />
-                        </div>
+                        {type == "customer" ? (
+                            <div className="mb-4">
+                                <label htmlFor="referral_code" className="block text-sm font-medium text-gray-700">Referral Code (optional)</label>
+                                <Field
+                                    id="referral_code"
+                                    name="referral_code"
+                                    type="text"
+                                    className="mt-1 block w-full rounded-md border border-gray-300 p-2 text-gray-900 shadow-sm placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                />
+                            </div>
+                        ): null}
+                        
                 
                         <button
                             type="submit"
@@ -123,6 +151,8 @@ export default function RegisterForm() {
                         >
                             Register
                         </button>
+                        
+                        <p className="mt-4 text-sm text-gray-600">Are you {type == 'customer' ? 'Organizer' : 'Customer'}? Click here to <Link href={`/register/${type == 'customer' ? 'organizer' : 'customer'}`} className="font-medium text-blue-500 hover:text-blue-600">Register</Link></p>
                     </div>
                 </Form>
                 

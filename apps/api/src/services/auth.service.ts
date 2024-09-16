@@ -3,11 +3,12 @@ import prisma from '../prismaClient';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { generateReferralCode } from './referral.service';
+import { addPoints } from './point.service';
 
 // Fungsi untuk register user
 export const registerUser = async (req: Request, res: Response) => {
   try {
-    const { name, fullName, email, password, role } = req.body;
+    const { fullName, email, password, role, referral_code } = req.body;
 
     // Hash password menggunakan bcrypt
     const salt = await bcrypt.genSalt(10);
@@ -25,24 +26,42 @@ export const registerUser = async (req: Request, res: Response) => {
       return;
     }
 
+    let discount_active = false;
+    let discount_expiry_date = new Date();
+    if (referral_code) {
+      // Cek referral code
+      const referralUser = await prisma.users.findUnique({
+        where: {
+          referral_code: referral_code
+        }
+      });
+      if (referralUser) {
+        discount_active = true;
+
+        let today = new Date();
+        discount_expiry_date = new Date(today.setMonth(today.getMonth() + 3));
+
+        addPoints({userId: referralUser.id, points: 10000}, res);
+      }
+    }
+
+    // Role : CUSTOMER, ORGANIZER, ADMIN
+    const modifiedRole = String(role).toUpperCase();
+    console.log(modifiedRole);
+
     // Membuat user baru di database menggunakan Prisma Client
     const user = await prisma.users.create({
       data: {
-        name,// Properti name harus sesuai dengan schema.prisma
+        name: fullName, // Properti name harus sesuai dengan schema.prisma
         fullName,
         email,
         password: hashedPassword, // Simpan password yang sudah di-hash
-        role,
+        role: modifiedRole,
         referral_code: generateReferralCode(fullName), // Pastikan ini juga sesuai dengan schema
+        discount_active: discount_active, // harus diganti,
+        discount_expiry_date: discount_expiry_date
       },
     });
-
-    // Tambahkan 10.000 point untuk user yang referral code nya dipakai
-    // Cari user id nya WHERE referral_code = req.body.referral_code
-
-    // Insert ke tx_users_point
-    
-
 
     // Response ketika berhasil
     res.status(201).json({ message: 'User registered successfully', user });
@@ -79,7 +98,7 @@ export const loginUser = async (req: Request, res: Response) => {
       { expiresIn: '1h' },
     );
 
-    res.json({ token });
+    res.json({ token, role: user.role });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });

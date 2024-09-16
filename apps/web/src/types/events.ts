@@ -17,18 +17,18 @@ export interface Event {
 }
 
 export interface User {
-  id: number;
-  name: string;
+  id?: number;
+  name?: string;
   password: string;
   email: string;
-  full_name: string;
-  created_date: string;
+  fullName: string;
+  created_date?: string;
   referral_code: string;
-  discount_active: boolean;
-  discount_expiry_date: string;
-  modified_date: string;
-  role: string;
-  points: number[];
+  discount_active?: boolean;
+  discount_expiry_date?: string;
+  modified_date?: string;
+  role?: string;
+  points?: number[];
 }
 
 export interface EventPrice {

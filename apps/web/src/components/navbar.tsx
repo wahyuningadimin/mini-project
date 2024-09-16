@@ -1,6 +1,13 @@
+'use client'
+
+import { getRole, getToken } from "@/lib/server"
 import Link from "next/link"
 
 export default function Navbar() {
+  const token = getToken();
+  const role = getRole();
+  const isLogin = token ? true : false;
+
   return (
     <div >
       <nav className="border-gray-200 flex">
@@ -15,18 +22,36 @@ export default function Navbar() {
               <ul
                 tabIndex={0}
                 className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
-                <li><Link href={'/events/create'}>Create Event</Link></li>
-                <li><Link href={'/login'}>Log In</Link></li>
-                <li><Link href={'/register'}>Register</Link></li>
+                { role == "ORGANIZER" ? (
+                  <li><Link href={'/events/create'}>Create Event</Link></li>
+                ) : null}
+                
+                { isLogin ? (
+                  <img className="w-10 h-10 p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500" src="/bruno-mars.jpeg" alt="Bordered avatar" />
+                ) : (
+                  <>
+                    <li><Link href={'/login'}>Log In</Link></li>
+                    <li><Link href={'/register/customer'}>Register</Link></li>
+                  </>
+                )}
+                
               </ul>
             </div>
             <p className="btn btn-ghost text-xl pl-0"><Link href={'/'}>Festiva</Link></p>
           </div>
           <div className="navbar-end hidden lg:flex">
             <ul className="menu menu-horizontal">
-              <li><Link href={'/events/create'}>Create Event</Link></li>
-              <li><Link href={'/login'}>Log In</Link></li>
-              <li><Link href={'/register'}>Register</Link></li>
+            { role == "ORGANIZER" ? (
+                  <li><Link href={'/events/create'}>Create Event</Link></li>
+                ) : null}
+              { isLogin ? (
+                <img className="w-10 h-10 p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500" src="/bruno-mars.jpeg" alt="Bordered avatar" />
+              ) : (
+                  <>
+                    <li><Link href={'/login'}>Log In</Link></li>
+                    <li><Link href={'/register/customer'}>Register</Link></li>
+                  </>
+                )}
             </ul>
           </div>
         </div>
