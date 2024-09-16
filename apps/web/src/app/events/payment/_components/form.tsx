@@ -1,10 +1,20 @@
 'use client'; // Ensure this is a client component
 
+import { useAuth } from '@/context/AuthContext';
 import fetchWrapper from '@/lib/fetch-wrapper';
 import { redirect, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-export default function PaymentForm({ totalPrice, eventId, tierId, quantity }) {
+interface PaymentFormProps {
+    totalPrice: number,
+    eventId: string | null,
+    tierId: number,
+    quantity: number,
+    useDiscount: boolean,
+    usePoints: boolean
+}
+
+export default function PaymentForm({ totalPrice, eventId, tierId, quantity, useDiscount, usePoints }: PaymentFormProps) {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [cardNumber, setCardNumber] = useState('');
@@ -17,6 +27,12 @@ export default function PaymentForm({ totalPrice, eventId, tierId, quantity }) {
     const [paymentMethod, setPaymentMethod] = useState('creditCard');
     const [error, setError] = useState('');
     const router = useRouter();
+    const authContext = useAuth();
+
+    useEffect(() => {
+        setName(authContext.user?.name || '');
+        setEmail(authContext.user?.email || '');
+    }, [authContext]);
 
     const handleSubmit = async (e:any) => {
         e.preventDefault();
@@ -34,17 +50,16 @@ export default function PaymentForm({ totalPrice, eventId, tierId, quantity }) {
 
         // Prepare payment data based on selected payment method
         const paymentData = {
-            userId: 1, // You should get the actual user ID from your context or state
             eventId: Number(eventId), // You should get the actual event ID from your context or state
-            promoCode: 0, // Optional: If you have a promo code
-            pointsUsed: 0, // Optional: If you have a points system
             paymentMethods: 'OVO',
             tickets: [
                 {
                     tierId: tierId,
                     quantity: quantity
                 }
-            ]
+            ],
+            useDiscount: useDiscount,
+            usePoints: usePoints
         };
 
 

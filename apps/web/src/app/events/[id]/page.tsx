@@ -1,46 +1,42 @@
+'use client'
+
 import { formatDate } from "@/app/helper/formatDate";
 import Wrapper from "@/components/wrapper";
+import { useAuth } from "@/context/AuthContext";
 import { getEventbyId, getEvents, getEventTiers } from "@/lib/events";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
-export const revalidate = 3600;
 
-// export const generateStaticParams = async () => {
-//     const { events } = await getEvents();
-//     return events.map((event: { id: number }) => ({
-//         params: {
-//             id: event.id.toString(),
-//         },
-//     }));
-// };
+export default function EventDetail({ params }: { params: { id: string } }) {
+    const authContext = useAuth();
+    const [event, setEvent] = useState<any>();
+    const [tiers, setTiers] = useState<any>();
+    const [role, setRole] = useState<string>('');
 
-export async function generateMetadata({ params }: { params: { id: string } }) {
-    const { event } = await getEventbyId(params.id);
+    useEffect(() => {
+        const fetchEvent = async () => {
+            const event = await getEventbyId(params.id);
 
-    if (!event) {
-        return {
-            title: "Event not found",
-        };
-    }
+            if (event.ok) {
+                setEvent(event.event);
+            }
+        }
 
-    return {
-        title: event.name,
-        category: event.category,
-        type: event.event_type,
-        date: event.event_date,
-        venue: event.venue,
-        location: event.location,
-        description: event.event_description,
-        openGraph: {
-            images: [event.image],
-        },
-    };
-}
+        const fetchTiers = async () => {
+            const tiers = await getEventTiers(params.id);
 
-export default async function EventDetail({ params }: { params: { id: string } }) {
-    const { event } = await getEventbyId(params.id); // Fetch all events
-    const { tiers } = await getEventTiers(params.id);
+            if (tiers.ok) {
+                setTiers(tiers.tiers);
+            }
+        }
+
+        setRole(authContext.user?.role || '');
+
+        fetchEvent();
+        fetchTiers();
+    }, []);
 
     if (!event) {
         return <div>Event not found</div>;
@@ -132,14 +128,17 @@ export default async function EventDetail({ params }: { params: { id: string } }
 
 
                         {/* Buy Ticket Button */}
-                        <div className="flex justify-end mt-4">
-                            <button
-                                type="submit"
-                                className="w-full sm:w-auto h-10 px-6 py-2.5 text-sm font-medium text-white bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-gray-300 rounded-lg transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
-                            ><Link href={`/events/payment?id=${event.id}`}>Buy Ticket</Link>
+                        {role && role == 'CUSTOMER' ? (
+                            <div className="flex justify-end mt-4">
+                                <button
+                                    type="submit"
+                                    className="w-full sm:w-auto h-10 px-6 py-2.5 text-sm font-medium text-white bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-gray-300 rounded-lg transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+                                ><Link href={`/events/payment?id=${event.id}`}>Buy Ticket</Link>
 
-                            </button>
-                        </div>
+                                </button>
+                            </div>
+                        ) : null}
+
                     </div>
                 </div>
 

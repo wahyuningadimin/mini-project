@@ -6,6 +6,7 @@ import authRouter from './routers/auth.router';
 import { authMiddleware } from './middlewares/auth.middleware';
 import { roleMiddleware } from './middlewares/role.middleware';
 import { PointRouter } from './routers/point.router';
+import userRouter from './routers/user.router';
 
 export default class App {
   public app: Express;
@@ -55,9 +56,7 @@ export default class App {
     this.app.use('/api/events', eventRouter.getRouter());  // Use getRouter()
     this.app.use('/api/auth', authRouter);
     this.app.use('/api/points', pointRouter.getRouter());
-
-
-
+    this.app.use('/api/users', userRouter);
 
     
     // Example for protected routes with roleMiddleware

@@ -157,6 +157,7 @@ export const FormCreate: React.FC = () => {
       if (result.status) {
         enqueueSnackbar({
           message: 'Event has been created!',
+          variant: 'success',
           anchorOrigin: {
             horizontal: 'center',
             vertical: 'bottom'
@@ -310,7 +311,7 @@ export const FormCreate: React.FC = () => {
             selected={formik.values.event_date ? new Date(formik.values.event_date) : null}
             onChange={(date) => formik.setFieldValue('event_date', date)}
             onBlur={() => formik.handleBlur('event_date')}
-            error={formik.touched.event_date && formik.errors.event_date ? formik.errors.event_date : ''}
+            // error={formik.touched.event_date && formik.errors.event_date ? formik.errors.event_date : ''}
           />
 
           <DatePickerField
@@ -319,7 +320,7 @@ export const FormCreate: React.FC = () => {
             selected={formik.values.ticket_start_date ? new Date(formik.values.ticket_start_date) : null}
             onChange={(date) => formik.setFieldValue('ticket_start_date', date)}
             onBlur={() => formik.handleBlur('ticket_start_date')}
-            error={formik.touched.ticket_start_date && formik.errors.ticket_start_date ? formik.errors.ticket_start_date : ''}
+            // error={formik.touched.ticket_start_date && formik.errors.ticket_start_date ? formik.errors.ticket_start_date : ''}
           />
 
           <DatePickerField
@@ -328,7 +329,7 @@ export const FormCreate: React.FC = () => {
             selected={formik.values.ticket_end_date ? new Date(formik.values.ticket_end_date) : null}
             onChange={(date) => formik.setFieldValue('ticket_end_date', date)}
             onBlur={() => formik.handleBlur('ticket_end_date')}
-            error={formik.touched.ticket_end_date && formik.errors.ticket_end_date ? formik.errors.ticket_end_date : ''}
+            // error={formik.touched.ticket_end_date && formik.errors.ticket_end_date ? formik.errors.ticket_end_date : ''}
           />
 
           </div>
