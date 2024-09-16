@@ -27,7 +27,7 @@ export default function Navbar() {
                 ) : null}
                 
                 { isLogin ? (
-                  <img className="w-10 h-10 p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500" src="/bruno-mars.jpeg" alt="Bordered avatar" />
+                  <img className="w-10 h-10 p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500" src="/avt.jpg" alt="Bordered avatar" />
                 ) : (
                   <>
                     <li><Link href={'/login'}>Log In</Link></li>

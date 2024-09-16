@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { uploader } from "../middlewares/uploader";
 import { ReviewController } from "@/controllers/review.controller";
 
 export class EventRouter {
