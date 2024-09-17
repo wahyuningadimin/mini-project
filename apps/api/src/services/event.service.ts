@@ -305,7 +305,7 @@ export const getEventTiers = async (req: Request, res: Response) => {
 export const eventCheckout = async (req: Request, res: Response) => {
     try {
         // Receiving data from the API request
-        const { eventId, paymentMethod, tickets, useDiscount, usePoints } = req.body;
+        const { eventId, tickets, useDiscount, usePoints } = req.body;
         const user = (req as AuthenticatedRequest).user;
         const userId = user?.userId;
 
@@ -433,7 +433,7 @@ export const eventCheckout = async (req: Request, res: Response) => {
             promo_code: 0,
             points_used: activePoints,
             original_price: totalPrice,
-            discounted_price: discountedPrice, // Need to be adjusted to calculate the promo
+            discounted_price: discountedPrice,
             payment_status: 'paid',
             payment_date: new Date()
         }
