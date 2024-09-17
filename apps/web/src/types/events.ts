@@ -14,6 +14,7 @@ export interface Event {
     created_date: string;
     modified_date: string;
     created_by: string;
+    slug: string;
 }
 
 export interface User {

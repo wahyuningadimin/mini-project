@@ -30,11 +30,11 @@ const HomePage: React.FC = () => {
   return (
     <div className="container flex flex-col min-h-screen p-4 mx-auto mt-2">
       <div className='my-[20px]'>
-        <p className='mb-6'>Event Name : <span className='font-semibold'>{event.name}</span></p>
+        <p className='mb-6'>Event Name : <span className='font-semibold'>{event?.name}</span></p>
         <ReviewFormCreate eventId={Number(eventId)} />
       </div>
     </div>
   );
 };
 
-export default ReviewForm;
+export default HomePage;

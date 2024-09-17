@@ -57,7 +57,7 @@ export const createEvent = async (formData: FormData) => {
 
 export const submitReview = async (review: any) => {
 
-    const res = await fetch(`${base_url}/review`, {
+    const res = await fetchWrapper(`${base_url}/review`, {
         cache: 'no-cache',
         method: "POST",
         body: JSON.stringify(review)

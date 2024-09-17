@@ -16,6 +16,7 @@ import DatePickerField from "@/components/Form/DatePicker";
 import { createEvent } from "@/lib/events";
 import { useRouter } from "next/navigation";
 import { useSnackbar } from "notistack";
+import DateTimePickerField from "@/components/Form/DateTimePicker";
 
 
 export const eventSchema = Yup.object({
@@ -140,14 +141,14 @@ export const FormCreate: React.FC = () => {
 
       let formData = new FormData();
       formData.append('name', data.name);
-      formData.append('event_date', data.event_date);
+      formData.append('event_date', data.event_date?.toISOString() || '');
       formData.append('location', data.location);
       formData.append('venue', data.venue);
       formData.append('category', data.category);
       formData.append('event_type', data.event_type);
       formData.append('event_description', data.event_description);
-      formData.append('ticket_start_date', data.ticket_start_date);
-      formData.append('ticket_end_date', data.ticket_end_date);
+      formData.append('ticket_start_date', data.ticket_start_date?.toISOString() || ''); 
+      formData.append('ticket_end_date', data.ticket_end_date?.toISOString() || '');
       formData.append('image', data.image);
       formData.append('tiers', JSON.stringify(composeTiers()));
 
@@ -305,7 +306,7 @@ export const FormCreate: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:justify-between gap-4">
 
 
-          <DatePickerField
+          {/* <DatePickerField
             name="event_date"
             label="Event Date"
             selected={formik.values.event_date ? new Date(formik.values.event_date) : null}
@@ -330,7 +331,37 @@ export const FormCreate: React.FC = () => {
             onChange={(date) => formik.setFieldValue('ticket_end_date', date)}
             onBlur={() => formik.handleBlur('ticket_end_date')}
             // error={formik.touched.ticket_end_date && formik.errors.ticket_end_date ? formik.errors.ticket_end_date : ''}
-          />
+          /> */}
+
+
+            <DateTimePickerField
+              name="event_date"
+              label="Event Date and Time"
+              selected={formik.values.event_date ? new Date(formik.values.event_date) : null}
+              onChange={date => formik.setFieldValue('event_date', date)}
+              onBlur={() => formik.setFieldTouched('event_date', true)}
+              error={formik.errors.event_date}
+            />
+
+            <DateTimePickerField
+              name="ticket_start_date"
+              label="Ticket Start Date and Time"
+              selected={formik.values.ticket_start_date ? new Date(formik.values.ticket_start_date) : null}
+              onChange={date => formik.setFieldValue('ticket_start_date', date)}
+              onBlur={() => formik.setFieldTouched('ticket_start_date', true)}
+              error={formik.errors.ticket_start_date}
+            />
+
+            <DateTimePickerField
+              name="ticket_end_date"
+              label="Ticket End Date and Time"
+              selected={formik.values.ticket_end_date ? new Date(formik.values.ticket_end_date) : null}
+              onChange={date => formik.setFieldValue('ticket_end_date', date)}
+              onBlur={() => formik.setFieldTouched('ticket_end_date', true)}
+              error={formik.errors.ticket_end_date}
+            />
+
+
 
           </div>
           <div className="flex justify-end">

@@ -107,7 +107,7 @@ export default function Home({
         <main className='py-4 px-8'>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             {events.map((event) => (
-              <Link key={event.id} href={`/events/${event.id}`}>
+              <Link key={event.id} href={`/events/${event.slug}`}>
                 <div className="relative bg-white border border-gray-200 shadow-lg flex flex-col transition-transform transform hover:scale-105 p-4" style={{ width: '100%', paddingBottom: '150%' }}>
                   <div className="absolute inset-0 flex flex-col">
                     {
