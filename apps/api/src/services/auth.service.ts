@@ -28,6 +28,7 @@ export const registerUser = async (req: Request, res: Response) => {
 
     let discount_active = false;
     let discount_expiry_date = new Date();
+    
     if (referral_code) {
       // Cek referral code
       const referralUser = await prisma.users.findUnique({

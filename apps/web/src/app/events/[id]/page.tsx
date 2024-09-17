@@ -128,7 +128,7 @@ export default function EventDetail({ params }: { params: { id: string } }) {
 
 
                         {/* Buy Ticket Button */}
-                        {role && role == 'CUSTOMER' ? (
+                        {(role && role == 'CUSTOMER') || !role ? (
                             <div className="flex justify-end mt-4">
                                 <button
                                     type="submit"

@@ -31,10 +31,14 @@ export const LoginForm: React.FC<LoginFormProps> = (props: LoginFormProps) => {
         try {
             const { result, ok } = await loginUser(data)
             if (!ok) throw result.msg
-            action.resetForm()
+            action.resetForm();
+
+            // React Context
             login(1, result.token, result.role, result.name, result.email);
 
+            // Local Storage
             saveToken(result.token);
+
             // saveRole(result.role);
             enqueueSnackbar({
                 message: 'Login success!',
