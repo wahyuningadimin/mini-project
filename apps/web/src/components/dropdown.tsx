@@ -1,17 +1,18 @@
 // components/Dropdown.tsx
 import { useAuth } from '@/context/AuthContext';
+import Link from 'next/link';
 import { useState } from 'react';
 
 export default function Dropdown() {
   const [isOpen, setIsOpen] = useState(false);
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
 
   return (
-    <div className="relative inline-block text-left px-0">
+    <div className="relative inline-block text-left px-0 z-50">
       {/* Dropdown Button */}
       <svg
         onClick={toggleDropdown}
@@ -36,6 +37,19 @@ export default function Dropdown() {
           aria-orientation="vertical"
           aria-labelledby="menu-button"
         >
+          {user && user.role == "CUSTOMER" ? (
+            <div className="py-1" role="none">
+              <Link
+                href='/customer'
+                className="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+                role="menuitem"
+                id="menu-item-2"
+              >
+                Your Events
+              </Link>
+            </div>
+          ) : null}
+
           <div className="py-1" role="none">
             <a
               onClick={logout}

@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 
 export const createReview = async (req: Request, res: Response) => {
     const user = (req as AuthenticatedRequest).user;
-    const { eventId, rating, review } = req.body;
+    const { event_id, rating, review } = req.body;
 
     if (!user) {
         res.status(400).json({ message: 'Unable to find user!' });
@@ -14,7 +14,7 @@ export const createReview = async (req: Request, res: Response) => {
         // Validate event
         const event = await prisma.events.findUnique({
             where: {
-                id: eventId
+                id: event_id
             }
         })
     
@@ -24,7 +24,7 @@ export const createReview = async (req: Request, res: Response) => {
 
         await prisma.eventsReview.create({
             data: {
-                event_id: Number(eventId),
+                event_id: Number(event_id),
                 user_id: Number(user?.userId) || 0,
                 rating: Number(rating),
                 review: review,

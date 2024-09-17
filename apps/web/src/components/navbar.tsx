@@ -27,11 +27,17 @@ export default function Navbar() {
                 tabIndex={0}
                 className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
                 {user && user.role == "ORGANIZER" ? (
-                  <li><Link href={'/events/create'}>Create Event</Link></li>
-                ) : null}
+                  <>
+                    <li><Link href={'/events/create'}>Create Events</Link></li>
+                    <li><a onClick={logout}>Logout</a></li>
+                  </>
+                ) : <>
+                  <li><Link href={'/customer'}>Your Events</Link></li>
+                  <li><a onClick={logout}>Logout</a></li>
+                </>}
 
                 {user && user.userId ? (
-                  <li><p>Welcome, <strong>{user.name}</strong>!</p></li>
+                  null
                 ) : (
                   <>
                     <li><Link href={'/login'}>Log In</Link></li>
@@ -46,7 +52,7 @@ export default function Navbar() {
           <div className="navbar-end hidden lg:flex">
             <ul className="menu menu-horizontal">
               {user && user.role == "ORGANIZER" ? (
-                <li><Link href={'/events/create'}>Create Event</Link></li>
+                <li><Link href={'/events/create'}>Create Events</Link></li>
               ) : null}
               {user && user.userId ? (
                 <>
@@ -65,7 +71,7 @@ export default function Navbar() {
 
 
       </nav>
-      <nav className="bg-white dark:bg-gray-700">
+      <nav className="bg-base-200 dark:bg-gray-700">
         <div className="max-w-screen-xl px-4 py-3 mx-auto">
           <div className="flex items-center">
             <ul className="flex flex-row font-medium mt-0 space-x-8 rtl:space-x-reverse text-sm">
