@@ -25,7 +25,8 @@ export class EventRouter {
     // Public
     this.router.get('/paginated', this.eventController.getEventsPaginated);
     this.router.get('/locations', this.eventController.getLocations);
-    this.router.get('/:id', this.eventController.getEventById)
+    this.router.get('/:id', this.eventController.getEventById);
+    this.router.get('/getEventBySlug/:slug', this.eventController.getEventBySlug);
     this.router.get('/getEventTiers/:eventId', this.eventController.getEventTiers)
   }
 

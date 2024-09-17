@@ -38,6 +38,7 @@ model Events {
   created_date      DateTime
   modified_date     DateTime
   created_by        String?
+  slug              String  @unique
 
   @@map("ms_events")
 }

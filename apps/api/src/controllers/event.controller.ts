@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
-import { createEvent, deleteEvent, editEvent, eventCheckout, getEventById, getEventsPaginated, getEventTiers, getLocations } from "@/services/event.service";
+import { createEvent, deleteEvent, editEvent, eventCheckout, getEventById, getEventBySlug, getEventsPaginated, getEventTiers, getLocations } from "@/services/event.service";
 
 export class EventController {
+    [x: string]: any;
     async createEvent(req: Request, res: Response) {
         return createEvent(req, res);
     }
@@ -20,6 +21,10 @@ export class EventController {
 
     async getEventById(req: Request, res: Response) {
         return getEventById(req, res);
+    }
+
+    async getEventBySlug(req: Request, res: Response) {
+        return getEventBySlug(req, res);
     }
 
     async getEventTiers(req: Request, res: Response) {

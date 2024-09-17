@@ -17,6 +17,13 @@ export const getEventbyId = async (id: string) => {
     return { result, event: result.event, ok: res.ok }
 }
 
+export const getEventBySlug = async (slug: string) => {
+    const res = await fetchWrapper(`${base_url}/events/getEventBySlug/${slug}`, { cache: 'no-cache', method: 'GET' })
+    const result = await res.json()
+
+    return { result, events: result.event || [], ok: res.ok };
+}
+
 export const getEventsPaginated = async (query: string, page: any, size: any, category: string, location: string) => {
     const res = await fetchWrapper(`${base_url}/events/paginated?query=${query}&page=${page}&size=${size}&category=${category}&location=${location}`, { method: 'GET' });
     const result = await res.json();

@@ -60,6 +60,7 @@ export const createEvent = async (req: Request, res: Response) => {
             const modified_date = new Date;
             const image = file.newFilename;
             const created_by = 'admin'; // Replace with actual user ID
+            const slug = Array.isArray(fields.slug) ? fields.slug[0] : fields.slug;
 
             const createdEvent = await prisma.events.create({
                 data: {
@@ -75,7 +76,8 @@ export const createEvent = async (req: Request, res: Response) => {
                     created_date: created_date,
                     modified_date: modified_date,
                     image: image,
-                    created_by: created_by as string
+                    created_by: created_by as string,
+                    slug: slug as string
                 }
             })
 
@@ -275,6 +277,24 @@ export const getEventById = async (req: Request, res: Response) => {
         })
     }
 }
+
+export const getEventBySlug = async (req: Request, res: Response) => {
+    try {
+        const event = await prisma.events.findUnique({
+            where: { slug: req.params.slug }
+        })
+        res.status(200).send({
+            status: 'ok',
+            event
+        })
+    } catch (err) {
+        res.status(400).send({
+            status: 'error',
+            msg: err
+        })
+    }
+}
+
 
 export const getEventTiers = async (req: Request, res: Response) => {
     try {
