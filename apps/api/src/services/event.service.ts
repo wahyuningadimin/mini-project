@@ -62,6 +62,11 @@ export const createEvent = async (req: Request, res: Response) => {
             const created_by = 'admin'; // Replace with actual user ID
             const slug = Array.isArray(fields.slug) ? fields.slug[0] : fields.slug;
 
+            if (!slug) {
+                console.error('Incoming fields:', fields);
+                return res.status(400).json({ message: 'Slug is required' });
+            }
+
             const createdEvent = await prisma.events.create({
                 data: {
                     name: name as string,
