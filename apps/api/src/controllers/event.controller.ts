@@ -1,46 +1,43 @@
 import { Request, Response } from "express";
-import prisma from "../prisma";
+import { createEvent, deleteEvent, editEvent, eventCheckout, getEventById, getEventBySlug, getEventsPaginated, getEventTiers, getLocations } from "@/services/event.service";
 
 export class EventController {
-    async createEvent(req: Request, res: Response){
-        try {
-            // if (!req.file) throw "no file uploaded"
-            // const link = `http://localhost:8000/api/public/event/${req?.file?.filename}`
-
-            const { name, event_date, location, venue, category, event_type, event_description, image, ticket_start_date, ticket_end_date, created_date, modified_date } = req.body
-
-            const event = await prisma.events.create({
-                data: {
-                    name, event_date, location, venue, category, event_type, event_description, image, ticket_start_date, ticket_end_date, created_date, modified_date
-                }
-            })
-            res.status(201).send({
-                status: 'ok',
-                msg: 'Event created!',
-                event
-            })
-        } catch (err) {
-            res.status(400).send({
-                status: 'error',
-                msg: err
-            })
-        }
+    [x: string]: any;
+    async createEvent(req: Request, res: Response) {
+        return createEvent(req, res);
     }
 
-    async getEvents(req: Request, res: Response) {
-        try {
-            const events = await prisma.events.findMany({
-                orderBy: { created_date: 'desc' }
-            })
-            res.status(200).send({
-                status: 'ok',
-                events
-            })
-        } catch (err) {
-            res.status(400).send({
-                status: 'error',
-                msg: err
-            })
-        }
+    async editEvent(req: Request, res: Response) {
+        return editEvent(req, res);
+    }
+
+    async getEventsPaginated(req: Request, res: Response) {
+        return getEventsPaginated(req, res);
+    }
+
+    async getLocations(req: Request, res: Response) {
+        return getLocations(req, res);
+    }
+
+    async getEventById(req: Request, res: Response) {
+        return getEventById(req, res);
+    }
+
+    async getEventBySlug(req: Request, res: Response) {
+        return getEventBySlug(req, res);
+    }
+
+    async getEventTiers(req: Request, res: Response) {
+        return getEventTiers(req, res);
+    }
+
+    async eventCheckout(req: Request, res: Response) {
+        return eventCheckout(req, res);
+    }
+
+    async deleteEvent(req: Request, res: Response) {
+        return deleteEvent(req, res);
     }
 }
+
+

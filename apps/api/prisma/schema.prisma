@@ -7,28 +7,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Sample {
-  id        Int      @id @default(autoincrement())
-  name      String
-  code      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("samples")
-}
-
 model Users {
   id            Int      @id @default(autoincrement())
-  password      String
-  role          String
-  email         String   @unique
-  created_date  DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  referral_code String?  @unique
-  points        UsersPoints[]  // Relasi dengan UsersPoints
-  fullName      String
   name          String?
-
+  password      String
+  email         String   @unique
+  fullName     String
+  created_date  DateTime @default(now())
+  referral_code String?  @unique
+  discount_active Boolean?
+  discount_expiry_date DateTime?  @default(dbgenerated("CURRENT_TIMESTAMP + INTERVAL 3 MONTH"))
+  modified_date DateTime? @default(now())
+  role          String?
+  
   @@map("ms_users")
 }
 
@@ -46,6 +37,8 @@ model Events {
   ticket_end_date   DateTime
   created_date      DateTime
   modified_date     DateTime
+  created_by        String?
+  slug              String  @unique
 
   @@map("ms_events")
 }
@@ -74,11 +67,10 @@ model EventsReview {
 model UsersPoints {
   id           Int        @id @default(autoincrement())
   user_id      Int
-  user         Users      @relation(fields: [user_id], references: [id])
   operations   Operations
   points       Int
   created_date DateTime   @default(now())
-  expired_date DateTime
+  expired_date DateTime?
 
   @@map("tx_users_points")
 }
@@ -88,7 +80,6 @@ model Transactions {
   id               Int           @id @default(autoincrement())
   event_id         Int
   user_id          Int
-  tier_id          Int
   promo_code       Int
   points_used      Int
   original_price   Int
@@ -125,4 +116,14 @@ enum PaymentStatus {
   unpaid
   pending
   paid
+}
+
+
+model TransactionDetails {
+  id                Int      @id @default(autoincrement())
+  event_id          Int
+  transaction_id    Int
+  tier_id           Int
+  quantity          Int
+  @@map("tx_transaction_details")
 }

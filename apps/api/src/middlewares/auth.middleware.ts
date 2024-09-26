@@ -15,6 +15,7 @@ export interface AuthenticatedRequest extends Request {
 // Middleware verifikasi token
 export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const token = req.header('Authorization')?.split(' ')[1];
+  console.log("token is : " + token);
 
   if (!token) {
     return res.status(401).json({ message: 'No token, authorization denied' });
@@ -39,19 +40,4 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
     console.error('JWT verification failed:', err); 
     return res.status(401).json({ message: 'Token is not valid' });
   }
-};
-
-// Middleware otorisasi peran
-export const roleMiddleware = (roles: string[]) => (req: Request, res: Response, next: NextFunction) => {
-  const user = (req as AuthenticatedRequest).user; 
-
-  if (!user) {
-    return res.status(401).json({ message: 'Authorization denied, no user found' });
-  }
-
-  if (!roles.includes(user.role)) {
-    return res.status(403).json({ message: `Access denied for role: ${user.role}` });
-  }
-
-  next();
 };
