@@ -1,26 +1,33 @@
 import { Router, Request, Response } from 'express';
+import { EventController } from '@/controllers/event.controller';
+import { authMiddleware } from '@/middlewares/auth.middleware';
+import { roleMiddleware } from '@/middlewares/role.middleware';
+import { Role } from '@/types/role';
+
 
 export class EventRouter {
   public router: Router;
+  private eventController: EventController;
 
   constructor() {
+    this.eventController = new EventController()
     this.router = Router();
     this.initializeRoutes();
   }
 
   private initializeRoutes(): void {
-    this.router.get('/', this.getAllEvents);
-    this.router.post('/', this.createEvent);
-  }
+    // Authenticated
+    this.router.post('/createEvent', authMiddleware, roleMiddleware([Role.ORGANIZER]), this.eventController.createEvent);
+    this.router.patch('/:id', authMiddleware, roleMiddleware([Role.ORGANIZER]), this.eventController.editEvent);
+    this.router.post('/eventCheckout', authMiddleware, roleMiddleware([Role.CUSTOMER]),this.eventController.eventCheckout)
+    this.router.delete('/:id', authMiddleware, roleMiddleware([Role.ORGANIZER]), this.eventController.deleteEvent)
 
-  // Contoh handler untuk mendapatkan semua event
-  private getAllEvents(req: Request, res: Response) {
-    res.json({ message: 'Get all events' });
-  }
-
-  // Contoh handler untuk membuat event baru
-  private createEvent(req: Request, res: Response) {
-    res.json({ message: 'Create new event' });
+    // Public
+    this.router.get('/paginated', this.eventController.getEventsPaginated);
+    this.router.get('/locations', this.eventController.getLocations);
+    this.router.get('/:id', this.eventController.getEventById);
+    this.router.get('/getEventBySlug/:slug', this.eventController.getEventBySlug);
+    this.router.get('/getEventTiers/:eventId', this.eventController.getEventTiers)
   }
 
   public getRouter(): Router {
